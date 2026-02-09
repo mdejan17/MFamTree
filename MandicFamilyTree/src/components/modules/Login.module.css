@@ -1,0 +1,15 @@
+.wellcomeMessage{
+    font-size: 2.5m;
+    color: rgba(0, 0, 0, 0.813);
+    padding: 10px;
+    border-radius: 5px;
+    margin: 0;
+}
+
+.loginMessage{
+    font-size: 2.5m;
+    color: rgba(0, 0, 0, 0.813);
+    padding: 10px;
+    border-radius: 5px;
+    margin: 0;
+}
