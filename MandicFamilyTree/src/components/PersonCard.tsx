@@ -115,16 +115,16 @@ export function CustomNode({ nodeDatum, toggleNode }: { nodeDatum: any; toggleNo
         {profilePic && (
           <image
             href={profilePic}
-            x={-imageSize / 2.2}
-            y={-height / 2 + 5}
+            x={-imageSize / 2}
+            y={-height / 2 - 0}
             width={imageSize}
             height={imageSize}
-            clipPath="circle(70px at 77px 90px)"
+            clipPath="circle(80px at 80px 90px)"
           />
         )}
         <text
           x={0}
-          y={-height / 2 + imageSize + 130}
+          y={-height / 2 + imageSize + 60}
           textAnchor="middle"
           style={{ fontSize: "2em"}}
         >

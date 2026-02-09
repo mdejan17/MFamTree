@@ -10,55 +10,66 @@ import style from './modules/Home.module.css'
 import React, {useState} from 'react'
 import { PersonCardSVG, PersonCard , CustomNode} from '../components/PersonCard.tsx';
 import SwitchTreeViewButton from '../components/SwitchTreeViewButton.tsx';
+import stylesButton from '../components/modules/Button.module.css'
+
 
 function Home() {
   const containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
-
-    // Center tree inline
-    const translate = { x: containerWidth / 4, y: containerHeight / 1.53 };
-    const renderNode = ({ nodeDatum }: { nodeDatum: PersonNode }) => {
-      return <PersonCardSVG person={nodeDatum.attributes} />;
-    };
+  const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('vertical');
+  
+  
+  // Center tree inline
+  const translate = { x: containerWidth / 4, y: containerHeight / 1.53 };
+  const renderNode = ({ nodeDatum }: { nodeDatum: PersonNode }) => {
+    return <PersonCardSVG person={nodeDatum.attributes} />;
+  };
+    
   return(
     <>
     <div className={style.rootDiv}  >
       <Header></Header>
       <AddUser></AddUser>
       <SwitchTreeViewButton></SwitchTreeViewButton>
-        
-        <div className={style.hierachyTree} id={style.cardViewTree}><Tree
-          data={Database2}
-          translate={translate}
-          zoom={0.061} 
-          orientation="horizontal" // or "vertical"
-          nodeSize={{ x: 1500, y: 320 }}
-          scaleExtent={{ min: 0.05, max: 1 }}
-          // pathFunc="elbow"
-          zoomable
-          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} />}
-          rootNodeClassName="node__root"
-          branchNodeClassName="node__branch"
-          leafNodeClassName="node__leaf"
-          collapsible={true}
-          enableLegacyTransitions={true}
-          transitionDuration={1000} 
-        /></div>
-        <div className={style.hierachyTree} id={style.textViewTree}><Tree
-          data={Database2}
-          translate={translate}
-          zoom={0.061} 
-          orientation="horizontal" // or "vertical"
-          nodeSize={{ x: 1500, y: 320 }}
-          scaleExtent={{ min: 0.05, max: 2 }}
-          // pathFunc="elbow"
-          zoomable
-          rootNodeClassName="node__root"
-          branchNodeClassName="node__branch"
-          leafNodeClassName="node__leaf"
-          enableLegacyTransitions={true}
-          transitionDuration={1000} 
-        /></div>
+      <button
+        onClick={() => setOrientation(prev => prev === 'vertical' ? 'horizontal' : 'vertical')}
+        className={stylesButton.setVorHTree}>
+          Switch to {orientation === 'vertical' ? 'Horizontal' : 'Vertical'}
+      </button>
+      <div className={style.hierachyTree} id={style.cardViewTree}><Tree
+        data={Database2}
+        translate={translate}
+        zoom={0.061} 
+        //orientation="horizontal" // or "vertical"
+        orientation={orientation}
+        nodeSize={{ x: 1500, y: 320 }}
+        scaleExtent={{ min: 0.05, max: 1 }}
+        // pathFunc="elbow"
+        zoomable
+        renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} />}
+        rootNodeClassName="node__root"
+        branchNodeClassName="node__branch"
+        leafNodeClassName="node__leaf"
+        collapsible={true}
+        enableLegacyTransitions={true}
+        transitionDuration={1000} 
+      /></div>
+      <div className={style.hierachyTree} id={style.textViewTree}><Tree
+        data={Database2}
+        translate={translate}
+        zoom={0.061} 
+        //orientation="horizontal" // or "vertical"
+        orientation={orientation}
+        nodeSize={{ x: 1500, y: 320 }}
+        scaleExtent={{ min: 0.05, max: 2 }}
+        // pathFunc="elbow"
+        zoomable
+        rootNodeClassName="node__root"
+        branchNodeClassName="node__branch"
+        leafNodeClassName="node__leaf"
+        enableLegacyTransitions={true}
+        transitionDuration={1000} 
+      /></div>
       </div>
       <Footer></Footer>
     </>
