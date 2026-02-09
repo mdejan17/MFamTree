@@ -1,0 +1,42 @@
+.tf-tree{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    height: 80vh;
+    width: 97vw;
+    font-size: 4em;
+    margin-top: 4vh;
+    margin-bottom: 0;
+    overflow: hidden;
+}
+.tf-tree *{
+    padding: 0;
+    box-sizing:inherit
+}
+.tf-tree>ul{
+    margin-bottom: auto;
+    overflow: scroll;
+}
+.tf-tree .tf-nc{
+    border: none ! important;
+    padding: 0 ! important;
+    font-size: 0.3em !important;
+}
+.tf-tree .tf-nc::before{
+    border-left-style: dashed !important;
+    font-size: 3em !important;
+}
+.tf-tree .tf-nc::after{
+    border-left-style: dashed !important;
+    font-size: 3em !important;
+}
+.tf-tree li li:before {
+    font-size: 1em !important;
+}
+.tf-tree li li:after {
+    font-size: 1em !important;
+
+}
+.tf-tree li ul{
+
+}

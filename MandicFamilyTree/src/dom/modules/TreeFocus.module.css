@@ -1,0 +1,6 @@
+.rootDiv{
+    background-color: hsl(147, 100%, 98%);
+    width: 99vw;
+    height: 95vh;
+    display: grid;
+}

@@ -1,15 +1,39 @@
 .node__root > circle {
-    fill: red;
-  }
-  
-  .node__branch > circle {
-    fill: yellow;
-  }
-  
-  .node__leaf > circle {
-    fill: green;
-    /* Let's also make the radius of leaf nodes larger */
-    r: 40;
-  }
+  fill: hsl(159, 43%, 59%)
+}
 
-  
+.node__branch > circle {
+  fill: hsl(159, 43%, 59%)
+}
+
+.node__leaf > circle {
+  fill: hsl(159, 43%, 59%)
+  /* Let's also make the radius of leaf nodes larger */
+}
+.rd3t-tree-container{
+  transform-origin: 100px 500px;
+  transform-box: view-box;
+}
+.node__root{
+  font-size: 0.7em;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: lighter;
+  font-weight: 10 !important;
+  font-style: normal;  text-decoration: none;
+}
+
+.node__branch{
+  font-size: 0.7em;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 10 !important;
+  font-style: normal;  text-decoration: none;
+}
+
+.node__leaf {
+  font-size: 0.7em;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: lighter;
+  font-weight: 10 !important;
+  font-style: normal;  text-decoration: none;
+
+}

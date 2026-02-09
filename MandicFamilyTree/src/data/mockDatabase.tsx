@@ -1,190 +1,455 @@
+import { DatabaseBigFlat } from "./bigDatabase";
 
 export enum Gender{
-    Male,
-    Female,
-  }
+  "Male",
+  "Female",
+}
 export interface Person{
-    uid: number;
-    firstName: string;
-    lastName: string;
-    maidenName?: string;
-    gender: Gender;
-    dateOfBirth?: Date;
-    dateOfDeath?: Date;
-    residency?: string;
-    note?: string;
-    parentUid: number[];
-    spouseUid?: number[];
-    offspringUid: number[];
-    profilePic?: string;
-    libarary?: string[];
+  uid: number;
+  firstName: string;
+  lastName: string;
+  maidenName?: string;
+  gender: string;
+  dateOfBirth?: Date;
+  dateOfDeath?: Date;
+  residency?: string;
+  note?: string;
+  parentUid: number[];
+  spouseUid?: number[];
+  offspringUid: number[];
+  profilePic?: string;
+  libarary?: string[];
+}
+export interface PersonNode {
+  name: string;
+  attributes: Person;
+  children?: PersonNode[];
+}
+// export const DatabaseFlat: Person[] = [
+//   // ─── Generation 1: Common Ancestor ─────────────────────────────
+//   {
+//     uid: 1,
+//     firstName: "William",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1930-01-15"),
+//     dateOfDeath: new Date("2005-06-20"),
+//     residency: "London, UK",
+//     note: "Family patriarch",
+//     parentUid: [999,999],
+//     spouseUid: [2],
+//     offspringUid: [3, 4, 5],
+//     profilePic: "william.jpg",
+//     libarary: ["will.pdf"]
+//   },
+//   {
+//     uid: 2,
+//     firstName: "Margaret",
+//     lastName: "Harrington",
+//     maidenName: "Clark",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1933-04-10"),
+//     dateOfDeath: new Date("2010-02-12"),
+//     residency: "London, UK",
+//     note: "Family matriarch",
+//     parentUid: [999,999],
+//     spouseUid: [1],
+//     offspringUid: [3, 4, 5],
+//     profilePic: "margaret.jpg",
+//     libarary: ["margaret.pdf"]
+//   },
+
+//   // ─── Generation 2 ──────────────────────────────────────────────
+//   {
+//     uid: 3,
+//     firstName: "Edward",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1955-03-02"),
+//     dateOfDeath: new Date("2020-09-01"),
+//     residency: "Manchester, UK",
+//     note: "Eldest son",
+//     parentUid: [1, 2],
+//     spouseUid: [6],
+//     offspringUid: [7, 8],
+//     profilePic: "edward.jpg",
+//     libarary: ["edward.pdf"]
+//   },
+//   {
+//     uid: 4,
+//     firstName: "Helen",
+//     lastName: "Turner",
+//     maidenName: "Harrington",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1958-07-18"),
+//     dateOfDeath: new Date("2022-01-05"),
+//     residency: "Bristol, UK",
+//     note: "Middle child",
+//     parentUid: [1, 2],
+//     spouseUid: [9],
+//     offspringUid: [10, 11],
+//     profilePic: "helen.jpg",
+//     libarary: ["helen.pdf"]
+//   },
+//   {
+//     uid: 5,
+//     firstName: "Robert",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1962-11-30"),
+//     dateOfDeath: new Date("2023-05-14"),
+//     residency: "Leeds, UK",
+//     note: "Youngest son",
+//     parentUid: [1, 2],
+//     spouseUid: [12],
+//     offspringUid: [13, 14],
+//     profilePic: "robert.jpg",
+//     libarary: ["robert.pdf"]
+//   },
+
+//   // ─── Generation 2 Spouses ──────────────────────────────────────
+//   {
+//     uid: 6,
+//     firstName: "Susan",
+//     lastName: "Harrington",
+//     maidenName: "Miller",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1957-05-21"),
+//     dateOfDeath: new Date("2018-08-10"),
+//     residency: "Manchester, UK",
+//     note: "Edward's wife",
+//     parentUid: [999],
+//     spouseUid: [3],
+//     offspringUid: [7, 8],
+//     profilePic: "susan.jpg",
+//     libarary: ["susan.pdf"]
+//   },
+//   {
+//     uid: 9,
+//     firstName: "David",
+//     lastName: "Turner",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1956-09-09"),
+//     dateOfDeath: new Date("2019-03-01"),
+//     residency: "Bristol, UK",
+//     note: "Helen's husband",
+//     parentUid: [999],
+//     spouseUid: [4],
+//     offspringUid: [10, 11],
+//     profilePic: "david.jpg",
+//     libarary: ["david.pdf"]
+//   },
+//   {
+//     uid: 12,
+//     firstName: "Linda",
+//     lastName: "Harrington",
+//     maidenName: "Evans",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1965-12-12"),
+//     dateOfDeath: new Date("2021-07-07"),
+//     residency: "Leeds, UK",
+//     note: "Robert's wife",
+//     parentUid: [999],
+//     spouseUid: [5],
+//     offspringUid: [13, 14],
+//     profilePic: "linda.jpg",
+//     libarary: ["linda.pdf"]
+//   },
+
+//   // ─── Generation 3 ──────────────────────────────────────────────
+//   {
+//     uid: 7,
+//     firstName: "James",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1980-06-06"),
+//     dateOfDeath: new Date("2070-01-01"),
+//     residency: "London, UK",
+//     note: "Grandson",
+//     parentUid: [3, 6],
+//     spouseUid: [15],
+//     offspringUid: [16, 17],
+//     profilePic: "james.jpg",
+//     libarary: ["james.pdf"]
+//   },
+//   {
+//     uid: 8,
+//     firstName: "Emily",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1983-02-14"),
+//     dateOfDeath: new Date("2075-01-01"),
+//     residency: "Oxford, UK",
+//     note: "Granddaughter",
+//     parentUid: [3, 6],
+//     spouseUid: [18],
+//     offspringUid: [19],
+//     profilePic: "emily.jpg",
+//     libarary: ["emily.pdf"]
+//   },
+//   {
+//     uid: 10,
+//     firstName: "Oliver",
+//     lastName: "Turner",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1985-10-10"),
+//     dateOfDeath: new Date("2075-01-01"),
+//     residency: "Bath, UK",
+//     note: "Grandson",
+//     parentUid: [4, 9],
+//     spouseUid: [20],
+//     offspringUid: [21],
+//     profilePic: "oliver.jpg",
+//     libarary: ["oliver.pdf"]
+//   },
+//   {
+//     uid: 11,
+//     firstName: "Sophie",
+//     lastName: "Turner",
+//     maidenName: "",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1988-12-01"),
+//     dateOfDeath: new Date("2080-01-01"),
+//     residency: "Bath, UK",
+//     note: "Granddaughter",
+//     parentUid: [4, 9],
+//     spouseUid: [],
+//     offspringUid: [],
+//     profilePic: "sophie.jpg",
+//     libarary: ["sophie.pdf"]
+//   },
+//   {
+//     uid: 13,
+//     firstName: "Thomas",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1990-03-03"),
+//     dateOfDeath: new Date("2080-01-01"),
+//     residency: "York, UK",
+//     note: "Grandson",
+//     parentUid: [5, 12],
+//     spouseUid: [22],
+//     offspringUid: [23],
+//     profilePic: "thomas.jpg",
+//     libarary: ["thomas.pdf"]
+//   },
+//   {
+//     uid: 14,
+//     firstName: "Lucy",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1993-07-07"),
+//     dateOfDeath: new Date("2085-01-01"),
+//     residency: "York, UK",
+//     note: "Granddaughter",
+//     parentUid: [5, 12],
+//     spouseUid: [],
+//     offspringUid: [],
+//     profilePic: "lucy.jpg",
+//     libarary: ["lucy.pdf"]
+//   },
+
+//   // ─── Generation 3 Spouses ──────────────────────────────────────
+//   {
+//     uid: 15,
+//     firstName: "Rachel",
+//     lastName: "Harrington",
+//     maidenName: "Moore",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1982-04-04"),
+//     dateOfDeath: new Date("2070-01-01"),
+//     residency: "London, UK",
+//     note: "James' wife",
+//     parentUid: [999],
+//     spouseUid: [7],
+//     offspringUid: [16, 17],
+//     profilePic: "rachel.jpg",
+//     libarary: ["rachel.pdf"]
+//   },
+//   {
+//     uid: 18,
+//     firstName: "Daniel",
+//     lastName: "Wright",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1981-01-01"),
+//     dateOfDeath: new Date("2070-01-01"),
+//     residency: "Oxford, UK",
+//     note: "Emily's husband",
+//     parentUid: [999],
+//     spouseUid: [8],
+//     offspringUid: [19],
+//     profilePic: "daniel.jpg",
+//     libarary: ["daniel.pdf"]
+//   },
+//   {
+//     uid: 20,
+//     firstName: "Natalie",
+//     lastName: "Turner",
+//     maidenName: "Reed",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1987-05-05"),
+//     dateOfDeath: new Date("2075-01-01"),
+//     residency: "Bath, UK",
+//     note: "Oliver's wife",
+//     parentUid: [999],
+//     spouseUid: [10],
+//     offspringUid: [21],
+//     profilePic: "natalie.jpg",
+//     libarary: ["natalie.pdf"]
+//   },
+//   {
+//     uid: 22,
+//     firstName: "Claire",
+//     lastName: "Harrington",
+//     maidenName: "Young",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("1991-06-06"),
+//     dateOfDeath: new Date("2080-01-01"),
+//     residency: "York, UK",
+//     note: "Thomas' wife",
+//     parentUid: [999],
+//     spouseUid: [13],
+//     offspringUid: [23],
+//     profilePic: "claire.jpg",
+//     libarary: ["claire.pdf"]
+//   },
+
+//   // ─── Generation 4: Great-Grandchildren ─────────────────────────
+//   {
+//     uid: 16,
+//     firstName: "Noah",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("2010-01-01"),
+//     dateOfDeath: new Date("2100-01-01"),
+//     residency: "London, UK",
+//     note: "Great-grandchild",
+//     parentUid: [7, 15],
+//     spouseUid: [],
+//     offspringUid: [],
+//     profilePic: "noah.jpg",
+//     libarary: ["noah.pdf"]
+//   },
+//   {
+//     uid: 17,
+//     firstName: "Ella",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("2013-03-03"),
+//     dateOfDeath: new Date("2100-01-01"),
+//     residency: "London, UK",
+//     note: "Great-grandchild",
+//     parentUid: [7, 15],
+//     spouseUid: [],
+//     offspringUid: [],
+//     profilePic: "ella.jpg",
+//     libarary: ["ella.pdf"]
+//   },
+//   {
+//     uid: 19,
+//     firstName: "Mia",
+//     lastName: "Wright",
+//     maidenName: "",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("2012-09-09"),
+//     dateOfDeath: new Date("2100-01-01"),
+//     residency: "Oxford, UK",
+//     note: "Great-grandchild",
+//     parentUid: [8, 18],
+//     spouseUid: [],
+//     offspringUid: [],
+//     profilePic: "mia.jpg",
+//     libarary: ["mia.pdf"]
+//   },
+//   {
+//     uid: 21,
+//     firstName: "Leo",
+//     lastName: "Turner",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("2015-11-11"),
+//     dateOfDeath: new Date("2100-01-01"),
+//     residency: "Bath, UK",
+//     note: "Great-grandchild",
+//     parentUid: [10, 20],
+//     spouseUid: [],
+//     offspringUid: [],
+//     profilePic: "leo.jpg",
+//     libarary: ["leo.pdf"]
+//   },
+//   {
+//     uid: 23,
+//     firstName: "Isla",
+//     lastName: "Harrington",
+//     maidenName: "",
+//     gender: Gender.Female,
+//     dateOfBirth: new Date("2018-08-08"),
+//     dateOfDeath: new Date("2100-01-01"),
+//     residency: "York, UK",
+//     note: "Great-grandchild",
+//     parentUid: [13, 22],
+//     spouseUid: [],
+//     offspringUid: [],
+//     profilePic: "isla.jpg",
+//     libarary: ["isla.pdf"]
+//   },
+//   {
+//     uid: 999,
+//     firstName: "unknown",
+//     lastName: "unknown",
+//     maidenName: "",
+//     gender: Gender.Male,
+//     dateOfBirth: new Date("1930-01-15"),
+//     dateOfDeath: new Date("2005-06-20"),
+//     residency: "unknown",
+//     note: "unknown",
+//     parentUid: [],
+//     spouseUid: [998],
+//     offspringUid: [],
+//     profilePic: "unknown.jpg",
+//     libarary: ["unknown.pdf"]
+//   }
+// ]
+function formatPerson(p: Person): Person {
+  return {
+    ...p,
+    dateOfBirth: p.dateOfBirth?.toISOString() as unknown as Date,
+    dateOfDeath: p.dateOfDeath?.toISOString() as unknown as Date,
+  };
+}
+function buildPersonNode(person: Person): PersonNode {
+  const personFormated = formatPerson(person);
+  const peopleById = Object.fromEntries(DatabaseBigFlat.map(p => [p.uid, p]));
+  console.log('PEOPLEBYID: ',  peopleById)
+  if (personFormated.offspringUid.length > 0) {
+    return {
+      name: personFormated.firstName + ' ' + personFormated.lastName,
+      attributes: personFormated,
+      children: personFormated.offspringUid
+        .map(uid => peopleById[uid])
+        .filter(Boolean) // ignore missing children
+        .map(child => buildPersonNode(child)),
+    };
   }
-
-export const Database: Person[] = [
-  {
-    uid: 1,
-    firstName: "John",
-    lastName: "Anderson",
-    maidenName: "",
-    gender: Gender.Male,
-    dateOfBirth: new Date("1975-04-12"),
-    dateOfDeath: new Date("2045-09-01"),
-    residency: "New York, USA",
-    note: "Family patriarch and avid chess player.",
-    parentUid: [10],
-    spouseUid: [2],
-    offspringUid: [3, 4],
-    profilePic: "john_anderson.jpg",
-    libarary: ["Birth Certificate", "Marriage License"]
-  },
-  {
-    uid: 2,
-    firstName: "Mary",
-    lastName: "Anderson",
-    maidenName: "Collins",
-    gender: Gender.Female,
-    dateOfBirth: new Date("1978-11-03"),
-    dateOfDeath: new Date("2050-06-18"),
-    residency: "New York, USA",
-    note: "Loves gardening and watercolor painting.",
-    parentUid: [13, 14],
-    spouseUid: [1],
-    offspringUid: [3, 4],
-    profilePic: "mary_anderson.jpg",
-    libarary: ["Passport", "Art Portfolio"]
-  },
-  {
-    uid: 3,
-    firstName: "Emily",
-    lastName: "Anderson",
-    maidenName: "",
-    gender: Gender.Female,
-    dateOfBirth: new Date("2001-02-21"),
-    dateOfDeath: new Date("2090-01-01"),
-    residency: "Boston, USA",
-    note: "Studying biomedical engineering.",
-    parentUid: [1, 2],
-    spouseUid: [],
-    offspringUid: [],
-    profilePic: "emily_anderson.jpg",
-    libarary: ["University Transcript"]
-  },
-  {
-    uid: 4,
-    firstName: "Lucas",
-    lastName: "Anderson",
-    maidenName: "",
-    gender: Gender.Male,
-    dateOfBirth: new Date("2004-07-09"),
-    dateOfDeath: new Date("2085-05-12"),
-    residency: "Chicago, USA",
-    note: "Semi-professional cyclist.",
-    parentUid: [1, 2],
-    spouseUid: [],
-    offspringUid: [],
-    profilePic: "lucas_anderson.jpg",
-    libarary: ["Race Medals", "Training Logs"]
-  },
-  {
-    uid: 5,
-    firstName: "Anna",
-    lastName: "Müller",
-    maidenName: "Schmidt",
-    gender: Gender.Female,
-    dateOfBirth: new Date("1969-01-30"),
-    dateOfDeath: new Date("2040-10-10"),
-    residency: "Munich, Germany",
-    note: "Historian specializing in medieval Europe.",
-    parentUid: [15, 16],
-    spouseUid: [6],
-    offspringUid: [7],
-    profilePic: "anna_mueller.jpg",
-    libarary: ["Doctoral Thesis", "Published Papers"]
-  },
-  {
-    uid: 6,
-    firstName: "Karl",
-    lastName: "Müller",
-    maidenName: "",
-    gender: Gender.Male,
-    dateOfBirth: new Date("1965-08-14"),
-    dateOfDeath: new Date("2038-03-22"),
-    residency: "Munich, Germany",
-    note: "Mechanical engineer with a passion for vintage cars.",
-    parentUid: [17, 18],
-    spouseUid: [5],
-    offspringUid: [7],
-    profilePic: "karl_mueller.jpg",
-    libarary: ["Engineering Certifications"]
-  },
-  {
-    uid: 7,
-    firstName: "Sophie",
-    lastName: "Müller",
-    maidenName: "",
-    gender: Gender.Female,
-    dateOfBirth: new Date("1998-12-05"),
-    dateOfDeath: new Date("2080-07-07"),
-    residency: "Berlin, Germany",
-    note: "Freelance graphic designer.",
-    parentUid: [5, 6],
-    spouseUid: [],
-    offspringUid: [],
-    profilePic: "sophie_mueller.jpg",
-    libarary: ["Design Portfolio"]
-  },
-  {
-    uid: 8,
-    firstName: "David",
-    lastName: "Nguyen",
-    maidenName: "",
-    gender: Gender.Male,
-    dateOfBirth: new Date("1988-06-17"),
-    dateOfDeath: new Date("2065-11-11"),
-    residency: "San Jose, USA",
-    note: "Software architect and open-source contributor.",
-    parentUid: [19, 20],
-    spouseUid: [9],
-    offspringUid: [10],
-    profilePic: "david_nguyen.jpg",
-    libarary: ["GitHub Archive"]
-  },
-  {
-    uid: 9,
-    firstName: "Linh",
-    lastName: "Nguyen",
-    maidenName: "Tran",
-    gender: Gender.Female,
-    dateOfBirth: new Date("1990-09-02"),
-    dateOfDeath: new Date("2070-04-30"),
-    residency: "San Jose, USA",
-    note: "UX researcher with a background in psychology.",
-    parentUid: [21, 22],
-    spouseUid: [8],
-    offspringUid: [10],
-    profilePic: "linh_nguyen.jpg",
-    libarary: ["Research Notes"]
-  },
-  {
-    uid: 10,
-    firstName: "Ethan",
-    lastName: "Nguyen",
-    maidenName: "",
-    gender: Gender.Male,
-    dateOfBirth: new Date("2018-03-15"),
-    dateOfDeath: new Date("2100-12-31"),
-    residency: "San Jose, USA",
-    note: "Enjoys building LEGO cities.",
-    parentUid: [8, 9],
-    spouseUid: [],
-    offspringUid: [],
-    profilePic: "ethan_nguyen.jpg",
-    libarary: ["School Records", "Artwork"]
-  }
-];
-
-
-export const Database2 = {
+  return {
+    name: personFormated.firstName + ' ' + personFormated.lastName,
+    attributes: personFormated,
+  };
+}
+export const Database2 = buildPersonNode(DatabaseBigFlat[0])
+export const DatabaseOld = {
   name: "CEO",
   attributes: {
     uid: 1,
@@ -312,4 +577,8 @@ export const Database2 = {
       ]
     }
   ]
+
 };
+
+console.log('DATABASE3: ',  DatabaseOld)
+console.log('DATABASE2: ',  Database2)

@@ -1,76 +1,96 @@
 
 import Header from '../components/Header.tsx'
 import Footer from '../components/Footer.tsx'
-import PersonCard from '../components/PersonCard.tsx'
-import Button from '../components/Button.tsx'
-import List from '../components/List.tsx'
-import UserGreating from '../components/UserGreating.tsx'
-import {Gender} from '../data/mockDatabase.tsx'
-import {Database} from '../data/mockDatabase.tsx'
 import Tree from 'react-d3-tree';
-import './components/modules/Tree.css';
-import {Database2} from '../data/mockDatabase.tsx'
-import React from 'react'
+import '../components/modules/Tree.css';
+import {Database2, type Person, type PersonNode} from '../data/mockDatabase.tsx'
 import 'treeflex/dist/css/treeflex.css'
 import AddUser from '../components/AddUser.tsx'
-import FamTree from '../components/FamTree.tsx'
-
+import style from './modules/Home.module.css'
+import React, {useState} from 'react'
+import { PersonCardSVG, PersonCard , CustomNode} from '../components/PersonCard.tsx';
+import SwitchTreeViewButton from '../components/SwitchTreeViewButton.tsx';
 
 function Home() {
+  const containerWidth = window.innerWidth;
+  const containerHeight = window.innerHeight;
 
-  // const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => (
-  //   <g>
-  //     <rect width="20" height="20" x="-10" onClick={toggleNode} />
-  //     <text fill="black" strokeWidth="1" x="20">
-  //       {nodeDatum.name}
-  //     </text>
-  //     {nodeDatum.attributes?.department && (
-  //       <text fill="black" x="20" dy="20" strokeWidth="1">
-  //         Department: {nodeDatum.attributes?.department}
-  //       </text>
-  //     )}
-  //   </g>
-  // );
-
+    // Center tree inline
+    const translate = { x: containerWidth / 4, y: containerHeight / 1.53 };
+    const renderNode = ({ nodeDatum }: { nodeDatum: PersonNode }) => {
+      return <PersonCardSVG person={nodeDatum.attributes} />;
+    };
   return(
     <>
-    <div className='rootDiv'  >
+    <div className={style.rootDiv}  >
       <Header></Header>
       <AddUser></AddUser>
-      <div className='Tree'>
-        {Database.map((person) => (
-          <PersonCard
-          uid={person.uid}
-          firstName={person.firstName}
-          lastName={person.lastName}
-          maidenName={person.maidenName}
-          gender={person.gender}
-          dateOfBirth={person.dateOfBirth}
-          dateOfDeath={person.dateOfDeath}
-          residency={person.residency}
-          note={person.note}
-          parentUid={person.parentUid}
-          spouseUid={person.spouseUid}
-          offspringUid={person.offspringUid}
-          profilePic={person.profilePic}
-          libarary={person.libarary}
-          />
-        ))}
-      </div>
-      <div id="treeWrapper" style={{ width: '100vh', height: '20vw'}}>
-        <Tree data={Database2}
+      <SwitchTreeViewButton></SwitchTreeViewButton>
+        
+        <div className={style.hierachyTree} id={style.cardViewTree}><Tree
+          data={Database2}
+          translate={translate}
+          zoom={0.061} 
+          orientation="horizontal" // or "vertical"
+          nodeSize={{ x: 1500, y: 320 }}
+          scaleExtent={{ min: 0.05, max: 1 }}
+          // pathFunc="elbow"
+          zoomable
+          renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} />}
           rootNodeClassName="node__root"
           branchNodeClassName="node__branch"
           leafNodeClassName="node__leaf"
-          />
+          collapsible={true}
+          enableLegacyTransitions={true}
+          transitionDuration={1000} 
+        /></div>
+        <div className={style.hierachyTree} id={style.textViewTree}><Tree
+          data={Database2}
+          translate={translate}
+          zoom={0.061} 
+          orientation="horizontal" // or "vertical"
+          nodeSize={{ x: 1500, y: 320 }}
+          scaleExtent={{ min: 0.05, max: 2 }}
+          // pathFunc="elbow"
+          zoomable
+          rootNodeClassName="node__root"
+          branchNodeClassName="node__branch"
+          leafNodeClassName="node__leaf"
+          enableLegacyTransitions={true}
+          transitionDuration={1000} 
+        /></div>
       </div>
-      <FamTree></FamTree>
       <Footer></Footer>
-      </div>
     </>
   );
 }
-//<UserGreating isLoggedIn={true} username='bato'></UserGreating>
+export default Home
+
+
+
+
+
+
+
+
+// const renderRectSvgNode = ({ nodeDatum, toggleNode }:any) => (
+//   <g>
+//     <rect width="20" height="20" x="-10" onClick={toggleNode} />
+//     <text fill="black" strokeWidth="1" x="20">
+//       {nodeDatum.name}
+//     </text>
+//     {nodeDatum.attributes?.department && (
+//       <text fill="black" x="20" dy="20" strokeWidth="1">
+//         Department: {nodeDatum.attributes?.department}
+//       </text>
+//     )}
+//   </g>
+// );
+
+
+
+
+  //<UserGreating isLoggedIn={true} username='bato'></UserGreating>
 //<PersonCard id='1' name='Bob' bio='Lorem ipsum dolor sit amet, amun ficus amur makab sit cumbus.'></PersonCard>
 //<PersonCard id='2' name='Sarah' bio='Lorem ipsum dolor sit amet, amun ficus amur makab sit cumbus.'></PersonCard>
 //<PersonCard id='3' name='John' bio='Lorem ipsum dolor sit amet, amun ficus amur makab sit cumbus.'></PersonCard>
@@ -85,5 +105,3 @@ function Home() {
 //<Footer></Footer>
 //</div>
 //
-
-export default Home

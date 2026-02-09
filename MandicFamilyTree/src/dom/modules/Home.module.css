@@ -1,0 +1,10 @@
+.hierachyTree{
+    width: 99vw;
+    height: 85vh;
+}
+#textViewTree{
+    display: none ;
+}
+#cardViewTree{
+    display: block ;
+}

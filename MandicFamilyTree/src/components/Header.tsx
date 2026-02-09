@@ -1,5 +1,7 @@
 import styles from './modules/Header.module.css'
 import stylesAddUSer from './modules/AddUser.module.css'
+import { Link } from 'react-router-dom';
+
 function Header(){
 
     function addUserHandler() {
@@ -12,10 +14,11 @@ function Header(){
         <header className={styles.header}>
             <nav>
                     <ul>
-                        <li><a href="">Home</a></li>
-                        <li><a href="">Search</a></li>
+                        <li><Link to={'/'}>Home</Link></li>
+                        <li><Link to={'/overview'}>Search</Link></li>
                         <li><a className='addUser' onClick={() => addUserHandler()}>Add</a></li>
-                        <li><a href="">Login</a></li>
+                        <li><Link to={'/login'}>Login</Link></li>
+                        <li><Link to={'/focus'}>Focus</Link></li>
                     </ul>
             </nav>
         </header>

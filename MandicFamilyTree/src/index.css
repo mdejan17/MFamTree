@@ -5,28 +5,11 @@
 }
 
 .rootDiv div{
-    border: 1px black solid;
+    /* border: 3px black solid; */
 }
 
-.tf-tree .tf-nc{
-    border: none ! important;
-    padding: 0 ! important;
-}
-.tf-tree .tf-nc::before{
-    border-left-style: dashed !important;
-}
 
-.tf-tree li li:before {
 
-}
-.tf-tree li ul{
 
-}
-.tf-tree *{
-    padding: 0;
-    box-sizing:inherit
-}
-.tf-tree{
-    margin-top: 2vw !important;
-    margin-left: 35% ;
-}
+
+
