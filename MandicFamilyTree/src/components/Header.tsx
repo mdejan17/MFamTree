@@ -7,7 +7,6 @@ function Header(){
     function addUserHandler() {
         (document.getElementsByClassName(stylesAddUSer.popup) as HTMLCollectionOf<HTMLElement>)[0].style.display='grid';
         (document.getElementsByClassName(stylesAddUSer.overlay) as HTMLCollectionOf<HTMLElement>)[0].style.display='block';
-     
     }
 
     return(

@@ -16,23 +16,9 @@ function Overview() {
                 <Header></Header>
                 <AddUser></AddUser>
                 <div className={style.overview}>
-                    {DatabaseBigFlat.map((person) => (
-                    <PersonCard
-                    uid={person.uid}
-                    firstName={person.firstName}
-                    lastName={person.lastName}
-                    maidenName={person.maidenName}
-                    gender={person.gender}
-                    dateOfBirth={person.dateOfBirth}
-                    dateOfDeath={person.dateOfDeath}
-                    residency={person.residency}
-                    note={person.note}
-                    parentUid={person.parentUid}
-                    spouseUid={person.spouseUid}
-                    offspringUid={person.offspringUid}
-                    profilePic={person.profilePic}
-                    libarary={person.libarary}
-                    />
+                    {DatabaseBigFlat.map((personI) => (
+                        <PersonCard person={personI}
+                        />
                     ))}
                 </div>
                 <Footer></Footer>

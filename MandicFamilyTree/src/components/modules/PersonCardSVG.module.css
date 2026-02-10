@@ -1,0 +1,31 @@
+.rootSVG {
+    transition: 0.5s ease;
+}
+g:has(> .rootSVG){
+    z-index: 100; 
+}
+.rootSVG:hover {
+    filter: brightness(1.08);
+    transform: scale(1.5);         
+    z-index: 100; 
+}
+.cardRect {
+    fill: #ffffff;  
+    filter: drop-shadow(200px 200px 200px rgba(0, 0, 0, 0.887));
+}
+.profileImage {
+    stroke: #0e0e0e;
+    stroke-width: 4;
+}
+.name {
+    font-size: 1em;
+    font-weight: 0 !important;
+    fill: #111827;
+}
+.note {
+    font-size: 1em;
+    fill: #6b7280;
+    font-style: italic;
+}
+
+/* kinda doesnt work */
