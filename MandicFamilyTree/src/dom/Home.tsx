@@ -11,15 +11,25 @@ import {useState} from 'react'
 import {CustomNode} from '../components/PersonCard.tsx';
 import SwitchTreeViewButton from '../components/SwitchTreeViewButton.tsx';
 import stylesButton from '../components/modules/Button.module.css'
-
+import SideBar from '../components/SideBar.tsx';
 
 function Home() {
 
   //Func and const for Tree management
-  const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [orientation, setOrientation,] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [resetKey, setResetKey] = useState(0);
+  const [curentDepth, setDepth] = useState< 10| 0 > ( 10 );
+  
+  const handleSetDepth = () => {
+    setDepth(getDepth())
+    setResetKey(prev => prev + 1);
+  };
   const translate = orientation === 'horizontal'
-    ? { x: window.innerWidth / 4, y: window.innerHeight / 1.53  }  
-    : { x: window.innerWidth / 2, y: window.innerHeight / 20  };
+    ? { x: window.innerWidth / 3, y: window.innerHeight / 1.57  }  
+    : { x: window.innerWidth / 1.5, y: window.innerHeight / 20  };
+
+  const getDepth = () => {
+    return ((curentDepth === 0) ? 10 : 0)};
   const getNodeSize = () => {
     return ((orientation === 'vertical') ? { x: 380, y: 1500  } : { x: 1500, y: 380  })};
   const getScaleExtent = () => {
@@ -32,20 +42,28 @@ function Home() {
       <div className={style.rootDiv}  >
         <Header></Header>
         <AddUser></AddUser>
+        <SideBar></SideBar>
         <SwitchTreeViewButton></SwitchTreeViewButton>
         <button
             onClick={() => setOrientation(prev => prev === 'vertical' ? 'horizontal' : 'vertical')}
             className={stylesButton.setVorHTree}>
               Switch to {orientation === 'vertical' ? 'Horizontal' : 'vertical'}
         </button>
+        <button
+            onClick={() => handleSetDepth()}
+            className={stylesButton.setDepthTree}>
+              Expand/Colase All
+        </button>
         <div className={style.hierachyTree} id={style.cardViewTree}>
           <Tree
+            key={resetKey}
             data={Database2 as any}
             translate={translate}
             zoom={getZoom()}
             orientation={orientation}
             nodeSize={getNodeSize()}
             scaleExtent={getScaleExtent()}
+            initialDepth={curentDepth}
             // pathFunc="elbow"
             zoomable
             renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} />}
@@ -59,12 +77,14 @@ function Home() {
         </div>
         <div className={style.hierachyTree} id={style.textViewTree}>
           <Tree
+            key={resetKey}
             data={Database2 as any}
             translate={translate}
             zoom={0.061} 
             orientation={orientation}
             nodeSize={getNodeSize()}
             scaleExtent={getScaleExtent()}
+            initialDepth={curentDepth}
             // pathFunc="elbow"
             zoomable
             rootNodeClassName="node__root"

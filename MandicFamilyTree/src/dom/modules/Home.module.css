@@ -8,3 +8,7 @@
 #cardViewTree{
     display: block ;
 }
+.treeLinks{
+    stroke: #4a90e2;             /* blue for normal branches */
+    stroke-width: 2.5px;
+}

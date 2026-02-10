@@ -6,7 +6,7 @@ import PersonCard from '../components/PersonCard.tsx'
 import {DatabaseBigFlat} from '../data/bigDatabase.tsx'
 import AddUser from '../components/AddUser.tsx'
 import style from './modules/Overview.module.css'
-
+import SideBar from '../components/SideBar.tsx';
 
 function Overview() {
     
@@ -15,6 +15,7 @@ function Overview() {
             <div className={style.rootDiv}  >
                 <Header></Header>
                 <AddUser></AddUser>
+                <SideBar></SideBar>
                 <div className={style.overview}>
                     {DatabaseBigFlat.map((personI) => (
                         <PersonCard person={personI}

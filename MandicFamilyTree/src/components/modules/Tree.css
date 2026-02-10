@@ -12,6 +12,7 @@
 .rd3t-tree-container{
   transform-origin: 100px 500px;
   transform-box: view-box;
+  background-color:rgba(217, 217, 217, 0.084);
 }
 .node__root{
   font-size: 0.7em;
@@ -34,4 +35,9 @@
   font-weight: lighter;
   font-weight: 10 !important;
   font-style: normal;  text-decoration: none;
+}
+.rd3t-link {
+  stroke: #303030 !important;          /* ← your desired color, e.g. blue */
+  stroke-width: 2.5px;      /* optional: adjust thickness */
+  fill: none;               /* usually already none, but good to be explicit */
 }

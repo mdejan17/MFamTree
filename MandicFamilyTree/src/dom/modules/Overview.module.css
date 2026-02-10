@@ -1,7 +1,38 @@
 .overview{
-    width: 97vw;
-    height: auto;
+    display: flex;
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-direction: column;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    overflow-x: auto;
+    position: relative;
+    z-index: 1;
+    left: 14.5vw;
+    width: 85vw;
+    height: 85vh;
 }
 .rootDiv{
     /* height: 80vh !important; */
 }
+
+.overvieww {
+    display: flex;
+    flex-direction: column;       /* ← key change */
+    flex-wrap: wrap;              /* ← allows multiple columns */
+    
+    height: 50vh;                 /* fixed height → enables wrapping */
+    width: 80vw;
+    overflow-y: auto;             /* scrollbar appears here */
+    overflow-x: hidden;
+    
+    position: relative;
+    left: 15.5vw;
+    z-index: 10;
+    
+    justify-content: flex-start;  /* start from top */
+    align-content: flex-start;    /* important for multi-column */
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
