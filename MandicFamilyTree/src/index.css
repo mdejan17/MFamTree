@@ -13,3 +13,31 @@
 
 
 
+.toolbar ul li:hover{
+background-color:  hsl(159, 33%, 49%);
+border-radius: 10px;
+}
+html:has(.node__leaf:hover,.node__branch:hover,.node__root:hover) .toolbar {
+opacity: 1;
+transform: translateX(0);     /* starts completely off-screen to the left */
+transition: 
+    opacity 0.4s ease,
+    transform 0.4s ease; 
+}
+.toolbar:hover{
+opacity: 1;
+transform: translateX(0);     /* starts completely off-screen to the left */
+transition: 
+    opacity 0.4s ease,
+    transform 0.4s ease; 
+
+}
+
+html:has([class^="personCard"]:hover) .toolbar {
+    opacity: 1;
+    transform: translateX(0);     /* starts completely off-screen to the left */
+    transition: 
+        opacity 0.4s ease,
+        transform 0.4s ease; 
+    
+  }

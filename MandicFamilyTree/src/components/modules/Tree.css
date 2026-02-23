@@ -1,3 +1,5 @@
+
+
 .node__root > circle {
   fill: hsl(159, 43%, 59%)
 }
@@ -10,9 +12,9 @@
   fill: hsl(159, 43%, 59%)
 }
 .rd3t-tree-container{
-  transform-origin: 100px 500px;
-  transform-box: view-box;
-  background-color:rgba(217, 217, 217, 0.084);
+  position: relative;
+  z-index: 1;
+  background-image: radial-gradient(hsl(0, 0%, 100%)0%, hsl(0, 0%, 95%));
 }
 .node__root{
   font-size: 0.7em;
@@ -40,4 +42,10 @@
   stroke: #303030 !important;          /* ← your desired color, e.g. blue */
   stroke-width: 2.5px;      /* optional: adjust thickness */
   fill: none;               /* usually already none, but good to be explicit */
+}
+.branch-link {
+  stroke: #0022ff;          /* brown branch color */
+  stroke-width: 2.2px;
+  stroke-linecap: round;    /* softer ends */
+  fill: none;
 }

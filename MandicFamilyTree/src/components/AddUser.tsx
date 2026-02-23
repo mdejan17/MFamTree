@@ -12,10 +12,16 @@ function AddUser() {
         <div className={styles.popup} id='addUserPopup'>
         <h1>Add User</h1>
         <ul>
-          <li>First Name <input type="firstName" /></li>
-          <li>Last Namee <input type="lastName" /></li>
+          <li><input type="firstName" placeholder='First Name' /></li>
+          <li><input type="lastName" placeholder='Last Name'/></li>
+          <li><input type="maidenName" placeholder='Maiden Name' /></li>
+          <li><input type="dateOfBirth" placeholder='Date of Birth'/></li>
+          <li><input type="dateOfDeath" placeholder='Date of Death' /></li>
+          <li><input type="residency" placeholder='Residency'/></li>
+          <li><input type="description" placeholder='Description' /></li>
+
         </ul>
-        <button onClick={(e) => addUserHandler(e)}>Add User</button>
+        <button onClick={(e) => addUserHandler(e)}>Add Person</button>
       </div>
       </>
     )

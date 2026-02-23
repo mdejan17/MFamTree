@@ -12,11 +12,13 @@ import {CustomNode} from '../components/PersonCard.tsx';
 import SwitchTreeViewButton from '../components/SwitchTreeViewButton.tsx';
 import stylesButton from '../components/modules/Button.module.css'
 import SideBar from '../components/SideBar.tsx';
-
+import Toolbar from '../components/Toolbar.tsx';
+import Crest from '../components/Crest.tsx';
 function Home() {
 
   //Func and const for Tree management
   const [orientation, setOrientation,] = useState<'horizontal' | 'vertical'>('horizontal');
+  const [pathFn, setPathFn,] = useState<'diagonal' | 'step'>('diagonal');
   const [resetKey, setResetKey] = useState(0);
   const [curentDepth, setDepth] = useState< 10| 0 > ( 10 );
   
@@ -25,34 +27,41 @@ function Home() {
     setResetKey(prev => prev + 1);
   };
   const translate = orientation === 'horizontal'
-    ? { x: window.innerWidth / 3, y: window.innerHeight / 1.57  }  
-    : { x: window.innerWidth / 1.5, y: window.innerHeight / 20  };
+    ? { x: window.innerWidth / 10, y: window.innerHeight / 1.57  }  
+    : { x: window.innerWidth / 1.6, y: window.innerHeight / 20  };
 
   const getDepth = () => {
     return ((curentDepth === 0) ? 10 : 0)};
   const getNodeSize = () => {
-    return ((orientation === 'vertical') ? { x: 380, y: 1500  } : { x: 1500, y: 380  })};
+    return ((orientation === 'vertical') ? { x: 550, y: 1500  } : { x: 2800, y: 380  })};
   const getScaleExtent = () => {
     return ((orientation === 'vertical') ? { min: 0.05, max: 1 } : { min: 0.05, max: 1 })};
   const getZoom = () => {
     return ((orientation === 'vertical') ? 0.061 : 0.05 )};
-    
+
   return(
     <>
       <div className={style.rootDiv}  >
         <Header></Header>
         <AddUser></AddUser>
+        <Toolbar></Toolbar>
         <SideBar></SideBar>
+        <Crest></Crest>
         <SwitchTreeViewButton></SwitchTreeViewButton>
-        <button
+        <button  // MOVE TO COMPONENET
             onClick={() => setOrientation(prev => prev === 'vertical' ? 'horizontal' : 'vertical')}
             className={stylesButton.setVorHTree}>
-              Switch to {orientation === 'vertical' ? 'Horizontal' : 'vertical'}
+             Horizontal/Vertical
         </button>
-        <button
+        <button  //MOVE TO COMPONENT
             onClick={() => handleSetDepth()}
             className={stylesButton.setDepthTree}>
               Expand/Colase All
+        </button>
+        <button  //MOVE TO COMPONENT
+            onClick={() => setPathFn(prev => prev === 'diagonal' ? 'step': 'diagonal')}
+            className={stylesButton.setPathFnTree}>
+              Change Path Function
         </button>
         <div className={style.hierachyTree} id={style.cardViewTree}>
           <Tree
@@ -64,7 +73,7 @@ function Home() {
             nodeSize={getNodeSize()}
             scaleExtent={getScaleExtent()}
             initialDepth={curentDepth}
-            // pathFunc="elbow"
+            pathFunc={pathFn}
             zoomable
             renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} />}
             rootNodeClassName="node__root"
@@ -80,12 +89,12 @@ function Home() {
             key={resetKey}
             data={Database2 as any}
             translate={translate}
-            zoom={0.061} 
+            zoom={getZoom()} 
             orientation={orientation}
             nodeSize={getNodeSize()}
             scaleExtent={getScaleExtent()}
             initialDepth={curentDepth}
-            // pathFunc="elbow"
+            pathFunc={pathFn}
             zoomable
             rootNodeClassName="node__root"
             branchNodeClassName="node__branch"
@@ -95,6 +104,7 @@ function Home() {
           />
         </div>
         <Footer></Footer>
+
       </div>
     </>
   );

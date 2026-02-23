@@ -5,7 +5,7 @@ import Overview from './dom/Overview.tsx'
 import TreeFocus from "./dom/TreeFocus.tsx"
 
 function App() {
-
+  document.body.style.zoom = "100%";
   return(
     <Router>
       <Routes>

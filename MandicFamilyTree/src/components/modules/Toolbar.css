@@ -1,0 +1,103 @@
+.toolbar{
+  opacity: 0;
+  background-image: linear-gradient(260deg,hsl(159, 43%, 59%),hsl(159, 30%, 49%));
+  border-radius: 15px;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  box-shadow: 10px 0px 10px rgba(0, 0, 0, 0.3);
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  width: 15vw;
+  height: 86vh;
+  margin-top: 0.5vh;
+  margin-left: -0.4vw;
+  position: absolute;
+  z-index: 99;
+  transform: translateX(-100%);     
+  transition: 
+    opacity 0.4s ease,
+    transform 0.4s ease;           
+  will-change: opacity, transform;
+}
+  
+.toolbarPhoto{
+  width: 10vw;
+  border-radius: 15px;
+  border: 3px white solid;
+  /* border-top-right-radius: 0; */
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: white;
+  padding-left: 2vw;
+  padding-right: 1vw;
+}
+.toolbar h2{
+  margin-top:10vh;
+  color:white;
+}
+.toolbarGallery{
+  display: flex;
+  border: 1px solid #ffffff69;
+  border-radius: 10px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: none;
+  flex-direction: column;       /* ← key change */
+  flex-wrap: wrap;              /* ← allows multiple columns */
+  height: 30vh;                 /* fixed height → enables wrapping */
+  width: 14.5vw;
+  padding-left: 0.2vw;
+  overflow-y: auto;             /* scrollbar appears here */
+  overflow-x: auto;
+  position: relative;
+  z-index: 10;
+  justify-content: flex-start;  /* start from top */
+  align-content: flex-start;    /* important for multi-column */
+  gap: 0.2vw;
+  box-sizing: border-box;
+}
+.toolbarGallery .toolbarGalleryPhoto{
+  width: 3vw;
+}
+.toolbarGallery p{
+  color: #ffffff;
+  align-self: center;
+  text-decoration:wavy;
+  font-weight: 1px;
+  font-style: italic;
+  font-size: 0.9em;
+  margin-left: 4.5vw;
+  margin-top: 14.5vh;
+}
+.toolbarInfo{
+  margin: 0.5vw;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  color: #fffffff6;
+  font-weight: 1;
+  font-style: normal;
+  font-style: italic;
+  font-size: normal;
+}
+.toolbar ul{
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  margin-top: 0px;
+  margin-bottom: px;
+  padding-left: 0;
+}
+.toolbar ul li{
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-decoration: none;
+  list-style-type: none;
+  border: 1px solid #ffffff44;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+

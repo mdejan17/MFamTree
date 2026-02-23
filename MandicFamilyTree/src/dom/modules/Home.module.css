@@ -1,6 +1,9 @@
 .hierachyTree{
-    width: 99vw;
-    height: 85vh;
+    width: 84.5vw;
+    height: 85.5vh;
+    position: relative;
+    left: 15vw;
+
 }
 #textViewTree{
     display: none ;

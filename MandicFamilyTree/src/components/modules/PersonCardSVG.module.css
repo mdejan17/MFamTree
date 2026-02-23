@@ -8,6 +8,11 @@ g:has(> .rootSVG){
     filter: brightness(1.08);
     transform: scale(1.5);         
 }
+
+.rootSVG:hover ~ .toolbar{
+    background-color: black;
+    transform: scale(1.5);         
+}
 .cardRect {
     fill: #ffffff;  
     filter: drop-shadow(200px 200px 200px rgba(0, 0, 0, 0.887));
@@ -28,3 +33,4 @@ g:has(> .rootSVG){
 }
 
 /* kinda doesnt work */
+

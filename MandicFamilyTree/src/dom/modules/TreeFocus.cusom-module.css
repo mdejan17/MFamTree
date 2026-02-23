@@ -8,6 +8,8 @@
     margin-top: 4vh;
     margin-bottom: 0;
     overflow: hidden;
+    position: relative;
+    left: 10vw;
 }
 .tf-tree *{
     padding: 0;
