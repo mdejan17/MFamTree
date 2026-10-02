@@ -13,6 +13,21 @@ if [[ ! -f server/.env ]]; then
   exit 1
 fi
 
+# The frontend's own .env controls VITE_API_URL, which gets baked into the
+# built JS at compile time (Vite env vars aren't runtime-configurable).
+# .env is gitignored, so a fresh clone has none — without this, the build
+# silently falls back to the http://localhost:4000/api default meant for
+# local dev, which from a real visitor's browser means "whatever's running
+# on *their own* machine's port 4000", not this server. A relative "/api"
+# always resolves against whatever origin served the page, which is exactly
+# right here since nginx (see nginx.conf.example) proxies /api/ on the same
+# origin as the static frontend — so there's nothing to configure per-deploy,
+# this works unchanged whether you're on a bare IP or later move to a domain.
+if [[ ! -f .env ]]; then
+  echo "== No root .env — writing one with a relative VITE_API_URL =="
+  echo "VITE_API_URL=/api" > .env
+fi
+
 echo "== Frontend: install + build =="
 npm install
 npm run build
@@ -50,6 +65,15 @@ else
 fi
 
 cd "$REPO_DIR"
+
+# Normalizes ownership back to the service's own user regardless of whether
+# this script itself was just run as root/sudo (which would otherwise leave
+# the database and node_modules root-owned — the service runs as
+# unprivileged `familytree` and would then crash-loop on every write with
+# "attempt to write a readonly database").
+if id familytree >/dev/null 2>&1; then
+  sudo chown -R familytree:familytree "$REPO_DIR"
+fi
 
 echo "== Restarting service =="
 sudo systemctl restart family-tree-api

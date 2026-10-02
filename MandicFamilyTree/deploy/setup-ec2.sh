@@ -80,6 +80,18 @@ systemctl daemon-reload
 systemctl enable family-tree-api
 
 echo "== Scheduling daily database backups =="
+# Minimal AL2023 AMIs don't install cron at all; Ubuntu/Debian's cloud
+# images do, but installing it unconditionally here is harmless either way.
+if ! command -v crontab >/dev/null; then
+  if [[ "$DISTRO_FAMILY" == "debian" ]]; then
+    apt-get install -y cron
+    systemctl enable --now cron
+  else
+    dnf install -y cronie
+    systemctl enable --now crond
+  fi
+fi
+
 # Installed into root's crontab (not $APP_USER's) since root can read the
 # SQLite file regardless of which user owns it. Idempotent: re-running this
 # script won't add a duplicate line for the same backup script.
