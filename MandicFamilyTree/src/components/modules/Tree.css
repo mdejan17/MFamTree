@@ -1,51 +1,43 @@
-
-
 .node__root > circle {
-  fill: hsl(159, 43%, 59%)
+  fill: #e3a13b;
 }
 
 .node__branch > circle {
-  fill: hsl(159, 43%, 59%)
+  fill: #6c7bd8;
 }
 
 .node__leaf > circle {
-  fill: hsl(159, 43%, 59%)
+  fill: #6c7bd8;
 }
+
 .rd3t-tree-container{
   position: relative;
   z-index: 1;
-  background-image: radial-gradient(hsl(0, 0%, 100%)0%, hsl(0, 0%, 95%));
-}
-.node__root{
-  font-size: 0.7em;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: lighter;
-  font-weight: 10 !important;
-  font-style: normal;  text-decoration: none;
+  background: #0c0e13;
+  background-image: radial-gradient(circle at 50% 30%, #14171e 0%, #0c0e13 70%);
 }
 
-.node__branch{
-  font-size: 0.7em;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 10 !important;
-  font-style: normal;  text-decoration: none;
-}
-
+.node__root,
+.node__branch,
 .node__leaf {
   font-size: 0.7em;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: lighter;
-  font-weight: 10 !important;
-  font-style: normal;  text-decoration: none;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-weight: 400;
+  font-style: normal;
+  text-decoration: none;
+  fill: #e7e9ee;
 }
+
 .rd3t-link {
-  stroke: #303030 !important;          /* ← your desired color, e.g. blue */
-  stroke-width: 2.5px;      /* optional: adjust thickness */
-  fill: none;               /* usually already none, but good to be explicit */
+  stroke: var(--accent, #e3a13b) !important;
+  stroke-opacity: 0.75;
+  stroke-width: 3px;
+  fill: none;
 }
+
 .branch-link {
-  stroke: #0022ff;          /* brown branch color */
-  stroke-width: 2.2px;
-  stroke-linecap: round;    /* softer ends */
+  stroke: #6c7bd8;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
   fill: none;
 }

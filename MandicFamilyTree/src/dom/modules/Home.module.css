@@ -1,17 +1,110 @@
-.hierachyTree{
-    width: 84.5vw;
-    height: 85.5vh;
-    position: relative;
-    left: 15vw;
+.rootDiv{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    overflow: hidden;
+}
 
+/* No reserved left lane on this page any more — the tree view's hover
+   info now floats as a Contextual Popover next to whichever node you're
+   on (see ContextualPopover.tsx), not a fixed side panel, so the canvas
+   can use the full width. */
+
+/* Fills all the room between the header and footer; the tree itself and
+   the control bar both live inside it, stacked via position rather than
+   flex order, so the tree can render underneath the controls instead of
+   being pushed down below them. */
+.stageArea{
+    flex: 1;
+    min-height: 0;
+    position: relative;
 }
-#textViewTree{
-    display: none ;
+
+.hierachyTree{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
 }
-#cardViewTree{
-    display: block ;
+
+/* Floats the control bar (and the focus-not-found notice) over the tree
+   instead of reserving its own row above it — the tree renders full-bleed
+   underneath, all the way up to the header. pointer-events is off on this
+   wrapper and back on for the bar/notice themselves, so the empty space
+   around and to the right of the buttons still lets clicks/drags on the
+   tree through to it. */
+.overlayControls{
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    pointer-events: none;
 }
+
+.controls{
+    pointer-events: auto;
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 24px;
+    box-sizing: border-box;
+}
+
+.focusNotice{
+    pointer-events: auto;
+    flex-shrink: 0;
+    width: calc(100% - 48px);
+    margin: 0 24px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    color: var(--ink);
+    font-size: 0.86rem;
+}
+
+.focusNotice button{
+    background: none;
+    border: none;
+    color: var(--sub);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.focusNotice button:hover{
+    color: var(--ink);
+}
+
 .treeLinks{
-    stroke: #4a90e2;             /* blue for normal branches */
+    stroke: var(--accent2);
     stroke-width: 2.5px;
+}
+
+.statusMessage{
+    position: relative;
+    padding: 2rem 24px;
+    font-size: 1.1rem;
+    color: var(--sub);
+}
+
+@media (max-width: 768px) {
+    .controls{
+        padding: 12px 16px;
+    }
+    .statusMessage{
+        padding: 1.5rem 1rem;
+    }
+    .focusNotice{
+        width: calc(100% - 32px);
+        margin: 0 16px 12px;
+    }
 }

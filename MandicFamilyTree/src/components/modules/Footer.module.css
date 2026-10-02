@@ -1,16 +1,19 @@
-footer{
-    /* border-radius: 10px; */
+.footer{
     display: flex;
     justify-content: center;
-    bottom: -0.75vh;
-    position: relative;
-    z-index: 3;
-    box-shadow: 0px -7px 7px rgba(0, 0, 0, 0.3);
-    padding: 0px;
-    margin-left: -0.4vw;
-    color:white;
-    text-align: center;
-    background-image: linear-gradient(220deg,hsl(159, 71%, 70%), hsl(158, 34%, 35%));
-    height: 5.7vh;
-    width: 100vw;
+    align-items: center;
+    height: var(--footer-h);
+    box-sizing: border-box;
+    padding: 14px 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.text{
+    margin: 0;
+    color: var(--sub);
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
 }

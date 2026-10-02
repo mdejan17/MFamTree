@@ -1,0 +1,24 @@
+[Unit]
+Description=Family Tree API (Express + SQLite)
+After=network.target
+
+[Service]
+Type=simple
+User=__APP_USER__
+WorkingDirectory=__REPO_DIR__/server
+ExecStart=/usr/bin/node dist/index.js
+Restart=on-failure
+RestartSec=3
+EnvironmentFile=__REPO_DIR__/server/.env
+# NODE_ENV isn't read from .env by dotenv at the point config.ts needs it
+# for the JWT_SECRET check, so set it explicitly here too.
+Environment=NODE_ENV=production
+
+# Light sandboxing — the service only needs to read/write its own data dir.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=__REPO_DIR__/server/data
+
+[Install]
+WantedBy=multi-user.target

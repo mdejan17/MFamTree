@@ -1,43 +1,88 @@
+/* ============================================================
+   "Atlas" design tokens — shared across every component's CSS
+   module via plain CSS variables (these aren't module-scoped,
+   so any *.module.css file can reference them with var(--...)).
+   ============================================================ */
+:root{
+    --bg: #0c0e13;
+    --surface: #14171e;
+    --surface-raised: #1b1f28;
+    --ink: #e7e9ee;
+    --sub: #868c99;
+    --line: #262b36;
+    --accent: #e3a13b;
+    --accent-ink: #141414;
+    --accent-soft: rgba(227, 161, 59, 0.14);
+    --accent2: #6c7bd8;
+    --accent2-soft: rgba(108, 123, 216, 0.16);
+    --danger: #e0695f;
+
+    --font-display: 'Unbounded', system-ui, sans-serif;
+    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+
+    /* Shared layout measurements so the header/sidebar/content/footer all
+       agree on the same numbers instead of each guessing a vw offset.
+       --sidebar-w is the full reserved lane on the left (SideBar's
+       backdrop + the left offset every main-content panel uses) — it's
+       wider than the floating Toolbar card itself (see Toolbar.css, which
+       hardcodes its own width) so that card can float with a margin and
+       still have the backdrop fully cover it, with room to spare. */
+    --header-h: 64px;
+    --sidebar-w: 300px;
+    --footer-h: 44px;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+html{
+    background: var(--bg);
+}
+
+body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+}
+
+a{
+    color: inherit;
+}
+
+#root{
+    min-height: 100vh;
+}
+
+::selection{
+    background: var(--accent-soft);
+    color: var(--ink);
+}
+
+/* a thin, dark-theme-appropriate scrollbar (Firefox + WebKit) */
+*{
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+}
+*::-webkit-scrollbar{
+    width: 10px;
+    height: 10px;
+}
+*::-webkit-scrollbar-track{
+    background: transparent;
+}
+*::-webkit-scrollbar-thumb{
+    background-color: var(--line);
+    border-radius: 999px;
+}
+
 .rootDiv{
-    background-color: hsl(0, 0%, 0%);
     width: 100%;
-    display: grid;
 }
-
-.rootDiv div{
-    /* border: 3px black solid; */
-}
-
-
-
-
-
-
-.toolbar ul li:hover{
-background-color:  hsl(159, 33%, 49%);
-border-radius: 10px;
-}
-html:has(.node__leaf:hover,.node__branch:hover,.node__root:hover) .toolbar {
-opacity: 1;
-transform: translateX(0);     /* starts completely off-screen to the left */
-transition: 
-    opacity 0.4s ease,
-    transform 0.4s ease; 
-}
-.toolbar:hover{
-opacity: 1;
-transform: translateX(0);     /* starts completely off-screen to the left */
-transition: 
-    opacity 0.4s ease,
-    transform 0.4s ease; 
-
-}
-
-html:has([class^="personCard"]:hover) .toolbar {
-    opacity: 1;
-    transform: translateX(0);     /* starts completely off-screen to the left */
-    transition: 
-        opacity 0.4s ease,
-        transform 0.4s ease; 
-    
-  }

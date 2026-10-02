@@ -1,0 +1,269 @@
+/* Most of this page's look comes straight from PersonProfile.module.css
+   (reused via `pstyle` in BranchProfile.tsx, not duplicated here) — this
+   file only adds the handful of things a branch needs that a person
+   doesn't: a 2-column dossier (no "parents/spouses" shelf either side of
+   a branch, just one record panel) and the clickable-avatar photo upload. */
+
+.dossierGridBranch {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.1rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 860px) {
+  .dossierGridBranch {
+    grid-template-columns: 1fr;
+  }
+}
+
+.avatarWrap {
+  display: inline-flex;
+}
+
+.monogram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.changePhotoLink {
+  margin: -0.4rem 0 0.9rem 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 0;
+}
+
+.changePhotoLink:hover {
+  text-decoration: underline;
+}
+
+.changePhotoLink:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.rootLink {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.rootLink:hover {
+  color: var(--accent);
+}
+
+/* Top-right icon actions (currently just branch delete) in the actions bar,
+   pushed away from the back button. */
+.topRightActions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Specificity note: these buttons sit inside pstyle.actions (imported from
+   PersonProfile.module.css), whose own ".actions button" rule would
+   otherwise win the cascade over a single ".iconBtnDanger" class and paint
+   them accent-orange instead of red. Qualifying with the ".topRightActions"
+   parent class (two classes) outranks that one-class-one-tag rule. */
+.topRightActions .iconBtnDanger {
+  width: 2.3rem;
+  height: 2.3rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  cursor: pointer;
+}
+
+.topRightActions .iconBtnDanger:hover {
+  background: rgba(224, 105, 95, 0.12);
+}
+
+/* The more destructive of the two delete actions (branch + every member,
+   not just unassigning them) — solid fill instead of outline so it reads
+   as a step above the other button at a glance. */
+.topRightActions .iconBtnDangerFilled {
+  background: var(--danger);
+  color: #fff;
+}
+
+.topRightActions .iconBtnDangerFilled:hover {
+  opacity: 0.85;
+  background: var(--danger);
+}
+
+/* Small pencil button sitting inline with the branch name heading. */
+.editNameBtn {
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--sub);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.editNameBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Members panel wraps into rows instead of one scrolling strip, capped at
+   roughly 3 rows tall (chip height ~82px + row gap) before it scrolls. */
+.membersGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-bottom: 0.3rem;
+}
+
+/* "Delete branch + all members" confirmation — a modal, not the inline
+   prompt the softer unassign-only delete uses, because typing DELETE needs
+   room to breathe and shouldn't be mistakeable for the lighter action. */
+.purgeOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+}
+
+.purgePopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 460px;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--danger);
+  border-radius: 14px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  z-index: 300;
+  padding: 1.6rem 1.6rem 1.3rem;
+}
+
+.purgePopup h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--danger);
+}
+
+.purgeWarning {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.purgeInput {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  outline: none;
+}
+
+.purgeInput:focus {
+  border-color: var(--danger);
+}
+
+.purgeActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+}
+
+.purgeCancelBtn {
+  padding: 0.55rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.purgeConfirmBtn {
+  padding: 0.55rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--danger);
+  background: var(--danger);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.purgeConfirmBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (max-width: 768px) {
+  .purgePopup {
+    width: 92%;
+    padding: 1.3rem 1.1rem 1.1rem;
+  }
+}
+
+/* Reserved as the last slot in .membersGrid — a bare circle, no label,
+   matching the chip avatars' size so it sits in line with them. */
+.addMemberBtn {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--accent);
+  background: none;
+  color: var(--accent);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.addMemberBtn:hover {
+  background: var(--accent-soft);
+}

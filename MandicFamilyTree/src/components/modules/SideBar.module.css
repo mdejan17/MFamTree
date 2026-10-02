@@ -1,24 +1,35 @@
 .sideBarBody{
-    display: grid;
-    opacity: 1;
     position: fixed;
-    background-image: linear-gradient(220deg,hsl(159, 71%, 70%), hsl(159, 34%, 11%));
-    /* background-color: hsl(159, 33%, 49%); */
-    z-index: 2;
-    box-shadow: 10px 0px 10px rgba(0, 0, 0, 0.3);
-    margin-top: -0.96vh;
-    margin-left: -0.4vw;
-    width: 15.5vw;
-    height: 99vh;
+    top: var(--header-h);
+    left: 0;
+    width: var(--sidebar-w);
+    height: calc(100vh - var(--header-h) - var(--footer-h));
+    z-index: 20;
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
-.sideBarBody p{
-    color: white;
-    align-self: center;
-    text-decoration:wavy;
-    font-weight: 1px;
+.sideBarBody > p{
+    color: var(--sub);
     font-style: italic;
-    font-size: 0.9em;
-    margin-top: -10vh;
-    margin-left: 0.5vw;
+    font-size: 0.86rem;
+    text-align: center;
+    margin: 0;
+}
+
+/* The sidebar only ever appears on hover, which touch screens can't
+   trigger — hide it on narrow viewports so it doesn't reserve space on a
+   phone-sized screen for an info panel nothing can open. */
+@media (max-width: 768px) {
+    .sideBarBody{
+        display: none;
+    }
 }

@@ -1,0 +1,523 @@
+<title>Focus Page Concepts</title>
+<style>
+  :root{
+    --bg:#0c0e13;
+    --surface:#14171e;
+    --surface-raised:#1b1f28;
+    --ink:#e7e9ee;
+    --sub:#868c99;
+    --line:#262b36;
+    --accent:#e3a13b;
+    --accent-ink:#141414;
+    --accent-soft:rgba(227,161,59,.14);
+    --accent2:#6c7bd8;
+    --accent2-soft:rgba(108,123,216,.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    padding-inline:20px;
+    padding-block:28px 60px;
+  }
+  h1,h2,h3{font-family:'Unbounded', system-ui, sans-serif; margin:0; text-wrap:balance;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  img{max-width:100%;}
+  [hidden]{display:none !important;}
+
+  /* ---------- intro ---------- */
+  .wrap{max-width:1180px; margin:0 auto;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+  .intro h1{font-size:clamp(1.5rem,3vw,2.1rem); font-weight:600; margin-bottom:10px;}
+  .intro p{color:var(--sub); font-size:.95rem; line-height:1.6; max-width:62ch; margin:0 0 22px;}
+
+  /* ---------- tabs ---------- */
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:28px;
+    position:sticky;
+    top:0;
+    padding-block:12px;
+    background:var(--bg);
+    z-index:5;
+    border-bottom:1px solid var(--line);
+  }
+  .tab{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    color:var(--sub);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:9px 16px;
+    cursor:pointer;
+    transition:color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .tab:hover{color:var(--ink); border-color:var(--accent);}
+  .tab:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .tab[aria-selected="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  .tab .n{opacity:.6; margin-right:7px;}
+
+  .screen{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:0;
+    overflow:hidden;
+  }
+  .screen-head{
+    padding:18px 24px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .screen-head h2{font-size:1.1rem; font-weight:500;}
+  .screen-head p{margin:4px 0 0; color:var(--sub); font-size:.85rem; max-width:56ch;}
+  .stage{
+    position:relative;
+    background:var(--bg);
+    min-height:560px;
+    padding:36px 28px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+  }
+
+  /* ================= shared chip bits ================= */
+  .chip{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    text-align:center;
+  }
+  .circle{
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#f5f6fa;
+    font-family:'Unbounded', system-ui, sans-serif;
+    font-weight:600;
+    flex-shrink:0;
+    border:2px solid var(--bg);
+  }
+  .name{font-size:.86rem; font-weight:500; color:var(--ink);}
+  .years{font-size:.72rem; color:var(--sub); font-family:'IBM Plex Mono', monospace;}
+  .photo-placeholder{
+    background:
+      radial-gradient(circle at 50% 38%, #3a3f4d 0 18%, transparent 19%),
+      radial-gradient(circle at 50% 95%, #3a3f4d 0 30%, transparent 31%),
+      linear-gradient(160deg,#20242e,#171a21);
+  }
+
+  /* ================= 1. Orbit ================= */
+  #stage-orbit svg{position:absolute; inset:0; width:100%; height:100%;}
+  #stage-orbit .ring{fill:none; stroke:var(--line); stroke-dasharray:2 7;}
+  #stage-orbit .link{fill:none; stroke:var(--accent2); stroke-width:1.6; opacity:.55;}
+  .orbit-node{position:absolute; transform:translate(-50%,-50%);}
+  .orbit-focus{
+    position:absolute; left:50%; top:46%; transform:translate(-50%,-50%);
+    display:flex; align-items:center; gap:-10px;
+  }
+  .orbit-focus .circle{width:84px; height:84px; font-size:1.3rem; border:3px solid var(--accent); box-shadow:0 0 0 6px var(--accent-soft);}
+  .orbit-focus .circle.spouse{border-color:var(--line); box-shadow:none; margin-left:-16px;}
+  .orbit-empty-parent{
+    position:absolute; left:50%; top:10%; transform:translate(-50%,-50%);
+    text-align:center;
+  }
+  .orbit-empty-parent .circle{
+    width:46px; height:46px; border:1.5px dashed var(--line); color:var(--sub); font-size:1.1rem; font-weight:400;
+    background:transparent;
+  }
+  .orbit-empty-parent .name{color:var(--sub); font-style:italic; font-size:.78rem;}
+  .orbit-child .circle{width:56px; height:56px; font-size:.95rem;}
+
+  /* ================= 2. Dossier ================= */
+  .dossier-grid{
+    display:grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width: 760px){ .dossier-grid{grid-template-columns:1fr;} }
+  .shelf{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px;
+  }
+  .shelf h3{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.68rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  .shelf-empty{color:var(--sub); font-style:italic; font-size:.8rem;}
+  .shelf-row{display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--line);}
+  .shelf-row:first-of-type{border-top:none;}
+  .shelf-row .circle{width:34px; height:34px; font-size:.68rem; border-width:1px;}
+  .shelf-row .name{font-size:.8rem; text-align:left;}
+  .shelf-row .years{font-size:.66rem;}
+  .fact{display:flex; justify-content:space-between; padding:7px 0; border-top:1px solid var(--line); font-size:.78rem;}
+  .fact:first-of-type{border-top:none;}
+  .fact span:first-child{color:var(--sub);}
+  .fact span:last-child{font-family:'IBM Plex Mono', monospace;}
+
+  .dossier-card{
+    background:
+      linear-gradient(180deg, var(--surface-raised), var(--surface));
+    border:1px solid var(--accent);
+    border-radius:14px;
+    padding:26px 24px;
+    text-align:center;
+  }
+  .dossier-photos{display:flex; justify-content:center; margin-bottom:16px;}
+  .dossier-photos .circle{width:88px; height:88px; font-size:1.4rem;}
+  .dossier-photos .circle:nth-child(2){margin-left:-18px;}
+  .dossier-card h2{font-size:1.35rem; margin-bottom:4px;}
+  .dossier-card .amp{color:var(--sub); font-weight:400; margin:0 6px;}
+  .dossier-card .meta{color:var(--sub); font-size:.82rem; font-family:'IBM Plex Mono', monospace; margin-bottom:10px;}
+  .dossier-card .note{font-size:.84rem; color:var(--ink); line-height:1.55; max-width:40ch; margin:0 auto;}
+
+  .dossier-children{margin-top:20px;}
+  .dossier-children h3{
+    font-family:'IBM Plex Mono', monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:12px;
+  }
+  .dossier-children-row{display:flex; gap:16px; overflow-x:auto; padding-bottom:6px;}
+  .dossier-children-row .chip{flex-shrink:0; width:76px;}
+  .dossier-children-row .circle{width:56px; height:56px; font-size:.9rem;}
+
+  /* ================= 3. Bands ================= */
+  .bands{display:flex; flex-direction:column; gap:0;}
+  .band{display:grid; grid-template-columns:120px 1fr; gap:18px; position:relative; padding-block:18px;}
+  .band + .band{border-top:1px solid var(--line);}
+  .band-label{
+    font-family:'IBM Plex Mono', monospace; font-size:.72rem; color:var(--sub);
+    display:flex; flex-direction:column; gap:3px; padding-top:4px;
+  }
+  .band-label b{color:var(--ink); font-size:.8rem; font-weight:600;}
+  .band-row{display:flex; gap:18px; flex-wrap:wrap; align-items:center;}
+  .band-row .chip{width:84px;}
+  .band-row.emphasis .circle{border-color:var(--accent); box-shadow:0 0 0 5px var(--accent-soft);}
+  .band .circle{width:50px; height:50px; font-size:.82rem;}
+  .band-row.emphasis .circle{width:64px; height:64px; font-size:1rem;}
+  .married{color:var(--accent); font-size:1.1rem; align-self:center;}
+  .ghost-chip .circle{border:1.5px dashed var(--line); background:transparent; color:var(--sub); font-weight:400;}
+  .ghost-chip .name{color:var(--sub); font-style:italic; font-size:.76rem;}
+
+  /* ================= 4. Spotlight ================= */
+  .spotlight{display:grid; grid-template-columns:.85fr 1.15fr; gap:0; min-height:520px; margin:-36px -28px;}
+  @media (max-width:760px){ .spotlight{grid-template-columns:1fr;} }
+  .spotlight-hero{
+    background:linear-gradient(165deg, var(--surface-raised), var(--surface));
+    padding:44px 36px;
+    display:flex; flex-direction:column; justify-content:center; gap:16px;
+    border-right:1px solid var(--line);
+  }
+  .spotlight-hero .circle{width:112px; height:112px; font-size:2rem; border:3px solid var(--accent); box-shadow:0 0 0 7px var(--accent-soft); margin-bottom:6px;}
+  .spotlight-hero h2{font-size:1.7rem;}
+  .spotlight-hero .meta{color:var(--sub); font-family:'IBM Plex Mono', monospace; font-size:.85rem;}
+  .spotlight-hero .note{color:var(--ink); font-size:.9rem; line-height:1.6; max-width:34ch;}
+  .spotlight-actions{display:flex; gap:10px; margin-top:8px;}
+  .btn{
+    font-family:'IBM Plex Sans', sans-serif; font-size:.8rem; font-weight:500;
+    padding:9px 16px; border-radius:999px; border:1px solid var(--line); background:var(--surface);
+    color:var(--ink); cursor:pointer;
+  }
+  .btn.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+
+  .relatives{padding:36px 36px;}
+  .rel-section{margin-bottom:26px;}
+  .rel-section h3{
+    font-family:'IBM Plex Mono', monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:12px; display:flex; align-items:center; gap:8px;
+  }
+  .rel-section h3::after{content:""; flex:1; height:1px; background:var(--line);}
+  .rel-row{
+    display:flex; align-items:center; gap:12px; padding:10px 10px;
+    border-radius:10px; transition:background .12s ease;
+  }
+  .rel-row:hover{background:var(--surface-raised);}
+  .rel-row .circle{width:38px; height:38px; font-size:.72rem;}
+  .rel-row .name{font-size:.85rem; text-align:left;}
+  .rel-row .years{font-size:.7rem;}
+  .rel-empty{color:var(--sub); font-style:italic; font-size:.82rem; padding:4px 10px 10px;}
+
+  /* ================= 5. Constellation ================= */
+  #stage-constellation{overflow:hidden;}
+  .star{position:absolute; width:2px; height:2px; background:#4b5366; border-radius:50%;}
+  #stage-constellation svg{position:absolute; inset:0; width:100%; height:100%;}
+  .const-link{fill:none; stroke:var(--accent); stroke-width:1.1; opacity:.5; filter:drop-shadow(0 0 2px rgba(227,161,59,.6));}
+  .const-link.dim{stroke:var(--line); opacity:.7; stroke-dasharray:2 5; filter:none;}
+  .const-node{position:absolute; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .const-node .circle{border:none; box-shadow:0 0 18px 2px rgba(227,161,59,.35);}
+  .const-node.unlit .circle{background:transparent !important; border:1.5px dashed var(--line); box-shadow:none; color:var(--sub);}
+  .const-node .name{font-family:'IBM Plex Mono', monospace; font-size:.68rem; letter-spacing:.03em; opacity:.75; transition:opacity .15s ease;}
+  .const-node:hover .name{opacity:1;}
+  .const-node:hover .circle{filter:brightness(1.15);}
+
+  footer.note{
+    margin-top:32px; color:var(--sub); font-size:.84rem; text-align:center;
+  }
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <div class="eyebrow">Mandić Family Tree — Focus page</div>
+    <h1>Five directions for a Focus page that doesn't feel like the Tree page</h1>
+    <p>
+      The Home tree is a pannable org-chart: right-angled dashed connectors, uniform rows. Focus is meant to be
+      a close-up on one person and their immediate family — so none of these five reuse that diagram
+      language. Content below is the real shape of a record (an empty parents slot, a married couple, five
+      children) so you can judge each layout against what you'll actually see.
+    </p>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Focus page concepts">
+    <button class="tab" role="tab" aria-selected="true" data-target="orbit"><span class="n">01</span>Orbit</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="dossier"><span class="n">02</span>Dossier</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="bands"><span class="n">03</span>Generations</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="spotlight"><span class="n">04</span>Spotlight</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="constellation"><span class="n">05</span>Constellation</button>
+  </div>
+
+  <!-- ============ 1. ORBIT ============ -->
+  <section class="screen" id="panel-orbit">
+    <div class="screen-head">
+      <div>
+        <h2>01 — Orbit</h2>
+        <p>The couple sits at the center of gravity; parents arc in above, children fan out below along curved orbit paths. Reads as "this person's solar system," not a chart.</p>
+      </div>
+    </div>
+    <div class="stage" id="stage-orbit">
+      <svg viewBox="0 0 900 540" preserveAspectRatio="xMidYMid meet">
+        <circle class="ring" cx="450" cy="250" r="110"/>
+        <circle class="ring" cx="450" cy="250" r="190"/>
+        <path class="link" d="M450,290 C450,340 230,370 170,410"/>
+        <path class="link" d="M450,290 C450,345 340,380 320,425"/>
+        <path class="link" d="M450,300 C450,350 450,390 450,435"/>
+        <path class="link" d="M450,290 C460,345 560,380 580,425"/>
+        <path class="link" d="M450,290 C470,340 670,370 730,410"/>
+        <path class="link" d="M440,180 C440,160 440,140 440,120" stroke-dasharray="2 7" stroke="#434a5a"/>
+      </svg>
+      <div class="orbit-empty-parent">
+        <div class="circle">?</div>
+        <div class="name">No parents on record</div>
+      </div>
+      <div class="orbit-focus">
+        <div class="chip"><div class="circle" style="background:#3f7ab0">MM</div><div class="name">Mitar</div><div class="years">1925–2001</div></div>
+        <div class="chip"><div class="circle spouse" style="background:#a34f82">JM</div><div class="name">Jovanka</div><div class="years">1930–2015</div></div>
+      </div>
+      <div class="orbit-node orbit-child" style="left:19%; top:76%;"><div class="chip"><div class="circle" style="background:#8a5fd1">SM</div><div class="name">Stana</div><div class="years">b. 1950</div></div></div>
+      <div class="orbit-node orbit-child" style="left:35%; top:79%;"><div class="chip"><div class="circle" style="background:#2f9e6f">MM</div><div class="name">Mirko</div><div class="years">1952–2015</div></div></div>
+      <div class="orbit-node orbit-child" style="left:50%; top:81%;"><div class="chip"><div class="circle photo-placeholder"></div><div class="name">Branko</div><div class="years">b. 1955</div></div></div>
+      <div class="orbit-node orbit-child" style="left:64.5%; top:79%;"><div class="chip"><div class="circle" style="background:#c9623f">AM</div><div class="name">Anđa</div><div class="years">b. 1958</div></div></div>
+      <div class="orbit-node orbit-child" style="left:81%; top:76%;"><div class="chip"><div class="circle" style="background:#2f93a8">DM</div><div class="name">Đuka</div><div class="years">b. 1961</div></div></div>
+    </div>
+  </section>
+
+  <!-- ============ 2. DOSSIER ============ -->
+  <section class="screen" id="panel-dossier" hidden>
+    <div class="screen-head">
+      <div>
+        <h2>02 — Dossier</h2>
+        <p>A profile sheet, not a diagram: the couple's record sits centered like an ID card, flanked by a parents shelf and a fact panel, with children as a browsable strip underneath.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="dossier-grid">
+        <div class="shelf">
+          <h3>Parents</h3>
+          <div class="shelf-empty">No parents on record.</div>
+        </div>
+        <div class="dossier-card">
+          <div class="dossier-photos">
+            <div class="circle" style="background:#3f7ab0">MM</div>
+            <div class="circle" style="background:#a34f82">JM</div>
+          </div>
+          <h2>Mitar <span class="amp">&amp;</span> Jovanka</h2>
+          <div class="meta">1925–2001 · 1930–2015 · Loznica</div>
+          <div class="note">Married 1948. Ran the family mill until 1979; five children, all still living in the Drina valley.</div>
+        </div>
+        <div class="shelf">
+          <h3>Record</h3>
+          <div class="fact"><span>Married</span><span>1948</span></div>
+          <div class="fact"><span>Children</span><span>5</span></div>
+          <div class="fact"><span>Parents on record</span><span>0</span></div>
+          <div class="fact"><span>Residency</span><span>Loznica</span></div>
+        </div>
+      </div>
+      <div class="dossier-children">
+        <h3>Children — 5</h3>
+        <div class="dossier-children-row">
+          <div class="chip"><div class="circle" style="background:#8a5fd1">SM</div><div class="name">Stana</div><div class="years">b. 1950</div></div>
+          <div class="chip"><div class="circle" style="background:#2f9e6f">MM</div><div class="name">Mirko</div><div class="years">1952–2015</div></div>
+          <div class="chip"><div class="circle photo-placeholder"></div><div class="name">Branko</div><div class="years">b. 1955</div></div>
+          <div class="chip"><div class="circle" style="background:#c9623f">AM</div><div class="name">Anđa</div><div class="years">b. 1958</div></div>
+          <div class="chip"><div class="circle" style="background:#2f93a8">DM</div><div class="name">Đuka</div><div class="years">b. 1961</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. BANDS ============ -->
+  <section class="screen" id="panel-bands" hidden>
+    <div class="screen-head">
+      <div>
+        <h2>03 — Generations</h2>
+        <p>Three horizontal bands, oldest to youngest, each labeled with the generation's span — a ledger of the family read top to bottom instead of a chart read outward.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="bands">
+        <div class="band">
+          <div class="band-label"><b>Parents</b><span>—</span></div>
+          <div class="band-row">
+            <div class="chip ghost-chip"><div class="circle">+</div><div class="name">No parents on record</div></div>
+          </div>
+        </div>
+        <div class="band">
+          <div class="band-label"><b>This generation</b><span>1925–1930</span></div>
+          <div class="band-row emphasis">
+            <div class="chip"><div class="circle" style="background:#3f7ab0">MM</div><div class="name">Mitar</div><div class="years">1925–2001</div></div>
+            <div class="married">⚭</div>
+            <div class="chip"><div class="circle" style="background:#a34f82">JM</div><div class="name">Jovanka</div><div class="years">1930–2015</div></div>
+          </div>
+        </div>
+        <div class="band">
+          <div class="band-label"><b>Children</b><span>1950–1961</span></div>
+          <div class="band-row">
+            <div class="chip"><div class="circle" style="background:#8a5fd1">SM</div><div class="name">Stana</div><div class="years">b. 1950</div></div>
+            <div class="chip"><div class="circle" style="background:#2f9e6f">MM</div><div class="name">Mirko</div><div class="years">1952–2015</div></div>
+            <div class="chip"><div class="circle photo-placeholder"></div><div class="name">Branko</div><div class="years">b. 1955</div></div>
+            <div class="chip"><div class="circle" style="background:#c9623f">AM</div><div class="name">Anđa</div><div class="years">b. 1958</div></div>
+            <div class="chip"><div class="circle" style="background:#2f93a8">DM</div><div class="name">Đuka</div><div class="years">b. 1961</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. SPOTLIGHT ============ -->
+  <section class="screen" id="panel-spotlight" hidden>
+    <div class="screen-head">
+      <div>
+        <h2>04 — Spotlight</h2>
+        <p>Half profile page, half relatives panel: the focused person gets real editorial space on the left, relationships live as a scannable, clickable list on the right.</p>
+      </div>
+    </div>
+    <div class="stage" style="padding:0;">
+      <div class="spotlight">
+        <div class="spotlight-hero">
+          <div class="circle" style="background:#3f7ab0">MM</div>
+          <h2>Mitar Mandić</h2>
+          <div class="meta">1925–2001 · Loznica</div>
+          <div class="note">Ran the family mill until 1979. Married Jovanka Petrović in 1948; five children.</div>
+          <div class="spotlight-actions">
+            <button class="btn primary">View in tree</button>
+            <button class="btn">Edit details</button>
+          </div>
+        </div>
+        <div class="relatives">
+          <div class="rel-section">
+            <h3>Parents</h3>
+            <div class="rel-empty">No parents on record.</div>
+          </div>
+          <div class="rel-section">
+            <h3>Spouse</h3>
+            <div class="rel-row"><div class="circle" style="background:#a34f82">JM</div><div><div class="name">Jovanka Mandić</div><div class="years">1930–2015</div></div></div>
+          </div>
+          <div class="rel-section">
+            <h3>Children — 5</h3>
+            <div class="rel-row"><div class="circle" style="background:#8a5fd1">SM</div><div><div class="name">Stana</div><div class="years">b. 1950</div></div></div>
+            <div class="rel-row"><div class="circle" style="background:#2f9e6f">MM</div><div><div class="name">Mirko</div><div class="years">1952–2015</div></div></div>
+            <div class="rel-row"><div class="circle photo-placeholder"></div><div><div class="name">Branko</div><div class="years">b. 1955</div></div></div>
+            <div class="rel-row"><div class="circle" style="background:#c9623f">AM</div><div><div class="name">Anđa</div><div class="years">b. 1958</div></div></div>
+            <div class="rel-row"><div class="circle" style="background:#2f93a8">DM</div><div><div class="name">Đuka</div><div class="years">b. 1961</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. CONSTELLATION ============ -->
+  <section class="screen" id="panel-constellation" hidden>
+    <div class="screen-head">
+      <div>
+        <h2>05 — Constellation</h2>
+        <p>No cards at all — just light. The family becomes a cluster of stars around the focused pair; an unknown ancestor renders as a faint, unlit point rather than disappearing.</p>
+      </div>
+    </div>
+    <div class="stage" id="stage-constellation">
+      <svg viewBox="0 0 900 540" preserveAspectRatio="xMidYMid meet">
+        <path class="const-link dim" d="M450,250 L450,120"/>
+        <path class="const-link" d="M450,270 L190,420"/>
+        <path class="const-link" d="M450,270 L330,445"/>
+        <path class="const-link" d="M450,280 L450,460"/>
+        <path class="const-link" d="M450,270 L570,445"/>
+        <path class="const-link" d="M450,270 L710,420"/>
+      </svg>
+      <div class="star" style="left:12%; top:18%;"></div>
+      <div class="star" style="left:80%; top:14%;"></div>
+      <div class="star" style="left:92%; top:55%;"></div>
+      <div class="star" style="left:6%; top:62%;"></div>
+      <div class="star" style="left:25%; top:10%;"></div>
+      <div class="star" style="left:70%; top:30%;"></div>
+      <div class="star" style="left:55%; top:8%;"></div>
+      <div class="const-node unlit" style="left:50%; top:22%;"><div class="circle" style="width:34px;height:34px;">?</div><div class="name">unknown</div></div>
+      <div class="const-node" style="left:44%; top:46%;"><div class="circle" style="width:72px;height:72px; font-size:1.2rem; background:#3f7ab0;">MM</div><div class="name">MITAR · 1925–2001</div></div>
+      <div class="const-node" style="left:57%; top:47%;"><div class="circle" style="width:60px;height:60px; font-size:1rem; background:#a34f82;">JM</div><div class="name">JOVANKA · 1930–2015</div></div>
+      <div class="const-node" style="left:21%; top:78%;"><div class="circle" style="width:46px;height:46px; font-size:.82rem; background:#8a5fd1;">SM</div><div class="name">STANA · b.1950</div></div>
+      <div class="const-node" style="left:36.5%; top:82%;"><div class="circle" style="width:46px;height:46px; font-size:.82rem; background:#2f9e6f;">MM</div><div class="name">MIRKO · 1952–2015</div></div>
+      <div class="const-node" style="left:50%; top:85%;"><div class="circle photo-placeholder" style="width:46px;height:46px;"></div><div class="name">BRANKO · b.1955</div></div>
+      <div class="const-node" style="left:63.5%; top:82%;"><div class="circle" style="width:46px;height:46px; font-size:.82rem; background:#c9623f;">AM</div><div class="name">ANĐA · b.1958</div></div>
+      <div class="const-node" style="left:79%; top:78%;"><div class="circle" style="width:46px;height:46px; font-size:.82rem; background:#2f93a8;">DM</div><div class="name">ĐUKA · b.1961</div></div>
+    </div>
+  </section>
+
+  <footer class="note">Pick a direction — or mix pieces of two (e.g. Spotlight's hero with Generations' bands) — and I'll build the real thing against your live data.</footer>
+</div>
+
+<script>
+(function(){
+  var tabs = document.querySelectorAll('.tab');
+  var panels = {
+    orbit: document.getElementById('panel-orbit'),
+    dossier: document.getElementById('panel-dossier'),
+    bands: document.getElementById('panel-bands'),
+    spotlight: document.getElementById('panel-spotlight'),
+    constellation: document.getElementById('panel-constellation')
+  };
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var target = tab.getAttribute('data-target');
+      tabs.forEach(function(t){ t.setAttribute('aria-selected', String(t === tab)); });
+      Object.keys(panels).forEach(function(key){
+        panels[key].hidden = key !== target;
+      });
+    });
+  });
+})();
+</script>

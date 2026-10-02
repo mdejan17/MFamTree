@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Tree Build Plan</title>
+<style>
+  :root{
+    --bg:#f7f5f1; --surface:#ffffff; --surface-2:#eeebe4; --border:#ddd6c8;
+    --text:#241f1a; --text-dim:#5c5448; --accent:#6b5b3e; --accent-2:#8a6d4f;
+    --good:#4a6b4d; --warn:#9c6b2e; --bad:#a24538; --code-bg:#efe9dd;
+    --shadow: 0 1px 2px rgba(36,31,26,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1812; --surface:#242018; --surface-2:#2c271d; --border:#3c3527;
+      --text:#ece6da; --text-dim:#b4ab98; --accent:#d8bd8a; --accent-2:#c9a876;
+      --good:#8fbf8f; --warn:#e0a855; --bad:#e08370; --code-bg:#2c2718;
+      --shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+    line-height:1.6; padding-inline: 16px;
+  }
+  .wrap{ max-width: 780px; margin: 0 auto; padding-block: 48px 80px; }
+  .masthead{ border-bottom: 2px solid var(--text); padding-bottom: 20px; margin-bottom: 36px; }
+  .eyebrow{
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px 0;
+  }
+  h1{ font-size: clamp(28px, 5vw, 40px); margin: 0 0 8px 0; font-weight: 700; }
+  .subhead{ color: var(--text-dim); font-size: 16px; margin: 0; max-width: 60ch; }
+  .meta-row{
+    display:flex; gap: 18px; flex-wrap: wrap; margin-top: 16px;
+    font-family: ui-monospace, monospace; font-size: 12px; color: var(--text-dim);
+  }
+  h2{ font-size: 22px; margin: 48px 0 6px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h2 .num{ font-family: ui-monospace, monospace; color: var(--accent); margin-right: 10px; font-size: 16px; }
+  h3{ font-size: 17px; margin: 28px 0 10px 0; }
+  p{ margin: 0 0 14px 0; }
+  .lede{ color: var(--text-dim); font-size: 15px; margin-bottom: 20px; }
+  table{ width:100%; border-collapse: collapse; margin: 16px 0 24px 0; font-size: 14.5px; }
+  caption{ caption-side: top; text-align:left; font-family: ui-monospace,monospace; font-size:12px; color:var(--text-dim); margin-bottom:6px;}
+  th,td{ text-align:left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th{ font-family: ui-monospace, monospace; font-size: 11px; letter-spacing:0.05em; text-transform: uppercase; color: var(--text-dim); font-weight: 500; }
+  .table-wrap{ overflow-x:auto; }
+  .pill{ display:inline-block; font-family: ui-monospace,monospace; font-size: 11px; padding: 2px 8px; border-radius: 3px; font-weight: 600; white-space: nowrap; }
+  .pill.done{ background: rgba(74,107,77,0.18); color: var(--good); }
+  .pill.partial{ background: rgba(156,107,46,0.18); color: var(--warn); }
+  .pill.stub, .pill.broken{ background: rgba(162,69,56,0.18); color: var(--bad); }
+  code, .mono{ font-family: ui-monospace, monospace; font-size: 0.9em; }
+  code{ background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
+  pre{ background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font-size: 13px; line-height: 1.55; }
+  pre code{ background:none; padding:0; }
+  .phase{ background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; margin: 16px 0; box-shadow: var(--shadow); }
+  .phase-head{ display:flex; align-items:baseline; gap: 10px; margin-bottom: 10px; }
+  .phase-tag{ font-family: ui-monospace,monospace; font-size: 11px; color: var(--surface); background: var(--accent); padding: 3px 9px; border-radius: 999px; font-weight: 700; flex-shrink:0; }
+  .phase h3{ margin:0; font-size:17px; }
+  .phase ul{ margin: 8px 0 0 0; padding-left: 20px; }
+  .phase li{ margin-bottom: 6px; }
+  .phase .why{ font-size: 13.5px; color: var(--text-dim); margin: 2px 0 10px 0; font-style: italic; }
+  ul.plain{ padding-left: 20px; }
+  ul.plain li{ margin-bottom: 8px; }
+  .callout{ border-left: 3px solid var(--accent); background: var(--surface-2); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 18px 0; font-size: 14.5px; }
+  .callout strong{ color: var(--accent-2); }
+  .decision{ display:grid; grid-template-columns: 1fr; gap: 10px; margin: 14px 0 22px 0; }
+  .decision-item{ background: var(--surface); border:1px solid var(--border); border-radius:7px; padding: 10px 14px; font-size: 14px; }
+  .decision-item .label{ font-family: ui-monospace,monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); margin-bottom:3px;}
+  footer{ margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-dim); font-family: ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <p class="eyebrow">Build plan &middot; Dynamic Family Tree Webapp</p>
+    <h1>From static mockup to working app</h1>
+    <p class="subhead">An audit of what exists today in <span class="mono">MandicFamilyTree</span>, and a phased plan to finish the frontend, build the backend, and wire it together.</p>
+    <div class="meta-row">
+      <span>Stack: Node.js + Express + TypeScript + SQLite</span>
+      <span>Hosting: AWS EC2</span>
+      <span>Auth: multi-user accounts</span>
+    </div>
+  </div>
+
+  <h2><span class="num">00</span>Where things stand today</h2>
+  <p class="lede">The project is a Vite + React 19 + TypeScript frontend with no backend of any kind. Everything is a static, hardcoded dataset bundled at build time — there's no API, no database, no authentication, and nothing that survives a page reload. Below is a page-by-page and component-by-component read of what's actually there.</p>
+
+  <h3>Pages (<code>src/dom/</code>)</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Page</th><th>Route</th><th>Status</th><th>Notes</th></tr>
+    <tr><td>Home</td><td><code>/</code></td><td><span class="pill partial">Partial</span></td><td>Renders two <code>react-d3-tree</code> views side by side, toggled via direct DOM manipulation instead of React state. Depth-toggle logic has a typo'd variable (<code>curentDepth</code>) but still runs.</td></tr>
+    <tr><td>Login</td><td><code>/login</code></td><td><span class="pill stub">Stub</span></td><td>Layout chrome only — no form fields, no inputs, no auth logic at all.</td></tr>
+    <tr><td>Overview</td><td><code>/overview</code></td><td><span class="pill partial">Partial</span></td><td>Grid of all 176 generated people via <code>PersonCard</code>. No pagination, no click-through (nowhere to click through to).</td></tr>
+    <tr><td>PersonProfile</td><td><code>/profile</code> (disabled)</td><td><span class="pill broken">Empty file</span></td><td>0 bytes. Route is commented out in <code>App.tsx</code>. This is the single biggest missing piece of the frontend.</td></tr>
+    <tr><td>TreeFocus</td><td><code>/focus</code></td><td><span class="pill partial">Partial</span></td><td>Wrapper around <code>FamTree.tsx</code>, which only renders one hardcoded person's immediate family (not a real recursive tree).</td></tr>
+  </table>
+  </div>
+
+  <h3>Components (<code>src/components/</code>)</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Component</th><th>Status</th><th>Notes</th></tr>
+    <tr><td>AddUser</td><td><span class="pill stub">Stub</span></td><td>Popup form exists visually, but inputs aren't wired (no <code>name</code>/<code>value</code>/<code>onChange</code>), and submit only <code>console.log</code>s. Writes nowhere.</td></tr>
+    <tr><td>Button</td><td><span class="pill broken">Dead code</span></td><td>Not imported anywhere in the app.</td></tr>
+    <tr><td>Crest</td><td><span class="pill stub">Stub</span></td><td>Crest image is hardcoded to <code>null</code> — always shows a placeholder "M" instead of a real family crest.</td></tr>
+    <tr><td>CustomPathFn</td><td><span class="pill broken">Dead code</span></td><td>Hand-written SVG path generator for tree branches, never actually wired into the tree's <code>pathFunc</code> prop.</td></tr>
+    <tr><td>FamTree</td><td><span class="pill broken">Fragile</span></td><td>Hardcodes <code>DatabaseBigFlat[2]</code> by array index (not uid). Only renders one generation; requires both parents to exist or renders nothing. Lots of leftover <code>console.log</code>.</td></tr>
+    <tr><td>Footer</td><td><span class="pill done">Done</span></td><td>Trivial, no issues.</td></tr>
+    <tr><td>Header</td><td><span class="pill partial">Partial</span></td><td>Nav links work. "Add" link shows the AddUser popup via raw DOM class lookups instead of shared state.</td></tr>
+    <tr><td>PersonCard</td><td><span class="pill partial">Has a real bug</span></td><td>Every person renders the <em>same</em> placeholder photo — <code>profilePic</code> from the data is never actually used. One variant also nests a <code>&lt;div&gt;</code> directly in an SVG <code>&lt;g&gt;</code>, which is invalid outside a <code>foreignObject</code>.</td></tr>
+    <tr><td>Scripts</td><td><span class="pill broken">Dead code</span></td><td>Not imported anywhere.</td></tr>
+    <tr><td>SideBar</td><td><span class="pill stub">Stub</span></td><td>Static placeholder text, no hover logic, no data wiring.</td></tr>
+    <tr><td>SwitchTreeViewButton</td><td><span class="pill partial">Fragile</span></td><td>Toggles visibility via direct DOM/CSS-module id lookups rather than React state.</td></tr>
+    <tr><td>Toolbar</td><td><span class="pill stub">Stub</span></td><td>Static lorem-ipsum bio and a hardcoded placeholder image gallery. Leftover comment confirms the gallery generator was never built.</td></tr>
+    <tr><td>UserGreating</td><td><span class="pill broken">Dead code</span></td><td>Correctly built but never rendered anywhere (also misspelled).</td></tr>
+  </table>
+  </div>
+
+  <h3>Data layer</h3>
+  <p>All "data" lives in two hardcoded TypeScript files: <code>src/data/mockDatabase.tsx</code> defines the <code>Person</code> type and a <code>buildPersonNode()</code> function that nests a flat array into a tree by <code>offspringUid</code>; <code>src/data/bigDatabase.tsx</code> holds 176 generated fake "Sinclair" family records (produced offline by <code>script.py</code> and pasted in by hand). There's a circular import between the two files that happens to work but is worth cleaning up.</p>
+  <p>Confirmed with a full grep of <code>src/</code>: <strong>zero</strong> instances of <code>fetch</code>, <code>axios</code>, <code>localStorage</code>, or any network/persistence call. Reloading the page always resets to the exact same 176 fake people. Nothing a user does in the UI survives a refresh.</p>
+
+  <h3>Other loose ends</h3>
+  <ul class="plain">
+    <li><strong>Chakra UI</strong> is a declared dependency but never actually imported — dead weight in the bundle.</li>
+    <li><code>misc/</code> (List.tsx, functions.ts, types.ts) are personal TypeScript practice files, unrelated to the app and unused.</li>
+    <li><code>src/components/Untitled-1.ini</code> is an unrelated stray text file (looks like a pasted network-debugging log) sitting in the components folder — safe to delete.</li>
+    <li><code>script.py</code> is a working, seeded Python generator for fake family data — useful to keep around for future test datasets, but it's a standalone script, not part of the build.</li>
+    <li>No <code>.env</code>, no <code>server/</code>/<code>api/</code> folder, no backend dependencies in <code>package.json</code> at all. This is a 100% static frontend today.</li>
+  </ul>
+
+  <div class="callout">
+    <strong>Bottom line:</strong> the visual shell and the tree-drawing concept are there, but almost nothing is actually wired up — not even within the frontend (buttons that don't do anything, forms that don't submit anywhere, photos that never change). The profile page doesn't exist, and there is no backend whatsoever. This plan treats the current frontend as a prototype to harden, not a finished layer to build an API under.
+  </div>
+
+  <h2><span class="num">01</span>Target shape of the system</h2>
+  <p>Per your answers: a Node.js + Express + TypeScript API, backed by SQLite, with real per-user accounts (so multiple family members can log in individually, with roles distinguishing who can edit vs. just view), deployed on an AWS EC2 instance. The frontend stays React + Vite, now talking to the API instead of importing static files.</p>
+
+  <h3>Proposed repo layout</h3>
+  <pre><code>MandicFamilyTree/
+  src/                  (existing React frontend)
+  server/               (new) Express + TS API
+    src/
+      db/               SQLite connection, migrations, seed script
+      models/           typed data-access functions per entity
+      routes/           people, relationships, auth, media
+      middleware/       auth guard, role guard, error handler
+      index.ts
+    package.json        (separate from frontend, or a workspace)
+  shared/               (optional) types shared between client &amp; server
+</code></pre>
+  <p>A separate <code>server/</code> package keeps frontend and backend dependency trees independent, which matters once you deploy — the EC2 box only needs to run the server (serving the built frontend as static files, or behind nginx).</p>
+
+  <h3>Data model — moving off array-of-ids</h3>
+  <p>The current <code>Person</code> type stores relationships as bare id arrays (<code>parentUid: number[]</code>, <code>spouseUid?: number[]</code>, <code>offspringUid: number[]</code>) duplicated on every related person — e.g. a child's uid appears in both parents' <code>offspringUid</code> arrays, and nothing enforces that those stay in sync. That's fine for a hand-edited mock file; it's a liability once people can add/edit through a UI, because it's easy for the arrays to drift out of sync with each other. For the real database, normalize into tables:</p>
+  <div class="table-wrap">
+  <table>
+    <caption>proposed SQLite schema (simplified)</caption>
+    <tr><th>Table</th><th>Columns</th></tr>
+    <tr><td><code>people</code></td><td>id, first_name, last_name, maiden_name, gender, date_of_birth, date_of_death, residency, note, profile_pic_url, created_by, created_at, updated_at</td></tr>
+    <tr><td><code>relationships</code></td><td>id, person_a_id, person_b_id, type (<code>parent_of</code> / <code>spouse_of</code>), start_date (for marriages), end_date</td></tr>
+    <tr><td><code>users</code></td><td>id, email, password_hash, display_name, role (<code>admin</code> / <code>editor</code> / <code>viewer</code>), linked_person_id (nullable — ties a login to their own tree entry), created_at</td></tr>
+    <tr><td><code>media</code></td><td>id, person_id, file_url, kind (<code>photo</code> / <code>document</code>), caption, uploaded_by, created_at</td></tr>
+    <tr><td><code>sessions</code> (optional)</td><td>only needed if you go with server-side sessions instead of JWT — see open decisions below</td></tr>
+  </table>
+  </div>
+  <p>A <code>parent_of</code> relationship row from A → B means "A is a parent of B"; siblings and spouses fall out of querying this one table, and children/parents/spouses can be derived with simple joins instead of trusting arrays to stay consistent. The API can still shape responses into the existing <code>PersonNode</code> tree format the frontend already expects, so this change is invisible to <code>react-d3-tree</code>.</p>
+
+  <h2><span class="num">02</span>Phased plan</h2>
+  <p class="lede">Nine phases, roughly in dependency order. Each is small enough to ship and test on its own rather than one giant rewrite.</p>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 0</span><h3>Clean up the frontend prototype</h3></div>
+    <p class="why">Cheap wins that remove noise before building on top of this code.</p>
+    <ul>
+      <li>Delete dead files: <code>Button.tsx</code>, <code>Scripts.tsx</code>, <code>CustomPathFn.tsx</code> (or wire it in, if you like the organic branch look), <code>UserGreating.tsx</code>, <code>misc/</code>, <code>Untitled-1.ini</code>, the unused <code>DatabaseOld</code> / <code>DatabaseMediumFlat</code> / commented-out <code>DatabaseFlat</code> blocks.</li>
+      <li>Remove <code>@chakra-ui/react</code> from <code>package.json</code> if you don't intend to adopt it, or commit to using it for the remaining UI work.</li>
+      <li>Strip stray top-level <code>console.log</code>s that fire on module import (<code>mockDatabase.tsx</code>) and the debug logs inside <code>FamTree.tsx</code>.</li>
+      <li>Fix the <code>curentDepth</code> typo and the invalid <code>type="firstName"</code>-style input attributes in <code>AddUser.tsx</code> while you're in those files.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 1</span><h3>Backend foundations</h3></div>
+    <p class="why">Nothing else can be wired up until there's an API to wire to.</p>
+    <ul>
+      <li>Scaffold <code>server/</code>: Express + TypeScript, <code>better-sqlite3</code> (synchronous, simplest for a small personal-scale app) or <code>sqlite3</code>/<code>knex</code> if you want a query builder.</li>
+      <li>Write migrations for <code>people</code>, <code>relationships</code>, <code>users</code>, <code>media</code>.</li>
+      <li>Write a seed script that imports the existing <code>DatabaseBigFlat</code> data (converted into the new schema) so you have real data to develop against immediately.</li>
+      <li>Basic Express setup: JSON body parsing, CORS (for local dev against Vite's port), centralized error handler, request logging.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 2</span><h3>Authentication &amp; roles</h3></div>
+    <p class="why">You asked for real multi-user accounts, not a shared login — this has to exist before any write endpoint matters.</p>
+    <ul>
+      <li>Signup / login endpoints; hash passwords with <code>bcrypt</code>; issue JWTs (or sessions — see open decision below).</li>
+      <li>Auth middleware that attaches the current user to each request; role-guard middleware for write operations (e.g. only <code>editor</code>/<code>admin</code> can create or modify people).</li>
+      <li>Build out <code>Login.tsx</code> for real: actual form, calls the API, stores the token, redirects on success, shows errors on failure.</li>
+      <li>Add a basic "my account" affordance (who's logged in, log out) — this is where the never-used <code>UserGreating</code> component idea finally gets a real purpose.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 3</span><h3>Core people/relationships API</h3></div>
+    <p class="why">CRUD for the actual domain data.</p>
+    <ul>
+      <li><code>GET /people</code>, <code>GET /people/:id</code>, <code>POST /people</code>, <code>PATCH /people/:id</code>, <code>DELETE /people/:id</code> (soft-delete recommended for a family archive — don't actually lose history).</li>
+      <li><code>POST /relationships</code>, <code>DELETE /relationships/:id</code> for linking parents/spouses.</li>
+      <li><code>GET /tree/:rootId</code> — server-side endpoint that walks the relationships table and returns a pre-built <code>PersonNode</code>-shaped tree, so the frontend doesn't need its own tree-building logic duplicated against a new data shape.</li>
+      <li>Input validation (e.g. <code>zod</code>) on every write endpoint.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 4</span><h3>Media (photos &amp; documents)</h3></div>
+    <p class="why">Right now every person shows the identical placeholder photo — fixing that needs real upload/storage, not just a data field.</p>
+    <ul>
+      <li><code>POST /people/:id/media</code> — multipart upload endpoint, storing files either on local disk on the EC2 instance (simplest) or S3 (more durable, barely more work if you're already on AWS).</li>
+      <li>Serve uploaded images statically; update <code>PersonCard</code>/<code>Crest</code>/<code>CustomNode</code> to actually read each person's <code>profilePic</code> URL instead of the hardcoded placeholder import.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 5</span><h3>Wire the frontend to the API</h3></div>
+    <p class="why">Replace static imports with real data fetching everywhere.</p>
+    <ul>
+      <li>Add a small API client (fetch wrapper) and a data-fetching layer — plain <code>useEffect</code>+state is fine at this scale, or <code>@tanstack/react-query</code> if you want caching/refetch handled for you.</li>
+      <li>Replace every import of <code>Database2</code> / <code>DatabaseBigFlat</code> in <code>Home.tsx</code>, <code>Overview.tsx</code>, <code>FamTree.tsx</code> with calls to the new endpoints.</li>
+      <li>Make <code>AddUser.tsx</code> actually functional: controlled inputs, real <code>onSubmit</code> that <code>POST</code>s to <code>/people</code>, success/error feedback, and a refresh of whichever view is open.</li>
+      <li>Fix the DOM-manipulation patterns in <code>SwitchTreeViewButton.tsx</code>, <code>Header.tsx</code>, and <code>Home.tsx</code>'s tree-view toggle to use React state (<code>useState</code>/context) instead of <code>getElementById</code>/<code>getElementsByClassName</code> — this will also make the app much easier to extend going forward.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 6</span><h3>Build the person profile page</h3></div>
+    <p class="why">This is currently a 0-byte file and a commented-out route — the single largest missing piece.</p>
+    <ul>
+      <li>Re-enable <code>/profile/:id</code> in <code>App.tsx</code>.</li>
+      <li>Build <code>PersonProfile.tsx</code> from scratch: full bio fields, dates, residency, note, relationship list (parents/spouse/children, each linking to their own profile), photo gallery, and edit controls (gated by role).</li>
+      <li>Wire <code>Overview.tsx</code>'s grid and the tree's <code>CustomNode</code> clicks to navigate to a person's profile.</li>
+      <li>Give <code>SideBar.tsx</code> and <code>Toolbar.tsx</code> a real job — e.g. hovering a tree node populates the sidebar with a quick-view card instead of static placeholder text.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 7</span><h3>Fix the tree rendering itself</h3></div>
+    <p class="why">Both tree implementations currently have real correctness bugs, independent of the data-source change.</p>
+    <ul>
+      <li>Decide on one tree renderer: either commit to <code>react-d3-tree</code> (used in <code>Home.tsx</code>) or <code>FamTree.tsx</code>'s <code>treeflex</code> approach — maintaining both long-term is wasted effort.</li>
+      <li>If keeping <code>FamTree.tsx</code>: make it recursive and lookup-by-uid instead of hardcoded array index, and relax the "both parents must exist" requirement so people with only one known parent still render.</li>
+      <li>Decide how to handle multiple marriages/remarriage and unknown ancestors (the current data uses sentinel <code>uid: 999</code>/<code>998</code> "unknown" placeholder people — fine as a convention, but worth making explicit/documented rather than implicit).</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 8</span><h3>Deploy to EC2</h3></div>
+    <p class="why">Your target environment — plan for it rather than bolting it on at the end.</p>
+    <ul>
+      <li>Single EC2 instance running: Node process (API, via <code>pm2</code> or a systemd service) + nginx reverse proxy serving the built React app and proxying <code>/api/*</code> to Express + HTTPS via Let's Encrypt/Certbot.</li>
+      <li>SQLite file lives on the instance's disk — back it up (a simple cron'd copy to S3 is enough at this scale; SQLite doesn't need a managed DB service for a family-sized dataset).</li>
+      <li>Environment config via <code>.env</code> (JWT secret, port, upload path) — never commit secrets; use an EC2-scoped <code>.env</code> or AWS Secrets Manager if you want to be thorough.</li>
+      <li>Basic CI (even just a GitHub Action that runs <code>tsc</code> + lint on push) catches regressions before they reach the instance.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-tag">Phase 9</span><h3>Polish &amp; hardening</h3></div>
+    <p class="why">Last, once the app actually works end-to-end.</p>
+    <ul>
+      <li>Loading/error states on every data fetch (currently nothing handles a failed/slow request anywhere).</li>
+      <li>Basic responsive pass — nothing in the current CSS modules appears to target phone widths.</li>
+      <li>Simple automated tests for the relationship-walking logic (easy to get subtly wrong) and for the auth/role guards.</li>
+      <li>A real gallery generator for <code>Toolbar.tsx</code> (currently a hardcoded placeholder set with a TODO comment acknowledging it was never built).</li>
+    </ul>
+  </div>
+
+  <h2><span class="num">03</span>Open decisions worth settling early</h2>
+  <div class="decision">
+    <div class="decision-item"><div class="label">JWT vs. server-side sessions</div>JWTs are simpler to deploy (stateless, no session store) and fine for a small family app; sessions are easier to revoke instantly if someone's access needs to be cut off. For this scale, JWT with a reasonably short expiry + refresh token is the pragmatic default unless you specifically want instant revocation.</div>
+    <div class="decision-item"><div class="label">Photo storage: local disk vs. S3</div>Local disk on the EC2 instance is simplest to start and costs nothing extra; S3 survives an instance replacement/resize and is barely more code since you're already on AWS. Worth doing S3 from the start if you expect to resize/replace the instance later.</div>
+    <div class="decision-item"><div class="label">Invite-only vs. open signup</div>For a family tree, you almost certainly want admin-issued invites rather than public signup — worth deciding before building the signup flow so you don't build the wrong one.</div>
+    <div class="decision-item"><div class="label">One tree renderer, not two</div>Phase 7 above — pick <code>react-d3-tree</code> or the <code>treeflex</code>/<code>FamTree</code> approach rather than maintaining both indefinitely.</div>
+  </div>
+
+  <h2><span class="num">04</span>Suggested order to actually work in</h2>
+  <p>Phases 0 → 1 → 2 → 3 unlock everything else and are mostly backend-only, so they can proceed without touching the fragile frontend bits yet. Phase 5 (wiring) is the one that touches the most existing files at once — doing phases 0 and 7 first means you're not wiring broken logic to a real API. Phases 4, 6, and 9 can interleave once the API is stable; phase 8 (EC2 deploy) is worth doing once, early, even with a half-finished app, just to deploy a known process rather than leaving it until the end.</p>
+
+  <footer>
+    Prepared from a full read of the existing codebase at <span class="mono">MandicFamilyTree</span> — routes, components, data layer, config, and <code>script.py</code>. No code was changed in preparing this plan.
+  </footer>
+
+</div>
+</body>
+</html>

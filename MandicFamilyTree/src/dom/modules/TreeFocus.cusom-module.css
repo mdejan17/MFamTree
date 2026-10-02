@@ -1,36 +1,47 @@
 .tf-tree{
     display: flex;
     align-items: center;
-    justify-content:center;
-    height: 80vh;
-    width: 97vw;
-    font-size: 4em;
-    margin-top: 4vh;
-    margin-bottom: 0;
-    overflow: hidden;
+    justify-content: center;
+    flex: 1;
+    min-height: 0;
+    /* Leave room for the fixed sidebar (see SideBar.module.css) so the tree
+       is centered in the space actually left over, not the full viewport. */
+    width: calc(100% - var(--sidebar-w));
+    font-size: 2.4em;
+    margin: 0;
+    overflow: auto;
     position: relative;
-    left: 10vw;
+    left: var(--sidebar-w);
+    color: var(--sub);
 }
 .tf-tree *{
     padding: 0;
-    box-sizing:inherit
+    box-sizing: inherit;
 }
 .tf-tree>ul{
-    margin-bottom: auto;
-    overflow: scroll;
+    margin: auto;
+    overflow: visible;
 }
 .tf-tree .tf-nc{
     border: none ! important;
     padding: 0 ! important;
     font-size: 0.3em !important;
+    background: transparent !important;
 }
-.tf-tree .tf-nc::before{
-    border-left-style: dashed !important;
-    font-size: 3em !important;
+.tf-tree p{
+    font-family: var(--font-mono);
+    font-size: 0.6em;
+    color: var(--sub);
 }
+.tf-tree li li:before,
+.tf-tree .tf-nc::before,
 .tf-tree .tf-nc::after{
+    border-color: var(--accent2) !important;
     border-left-style: dashed !important;
-    font-size: 3em !important;
+}
+.tf-tree .tf-nc::before,
+.tf-tree .tf-nc::after{
+    font-size: 2.2em !important;
 }
 .tf-tree li li:before {
     font-size: 1em !important;
@@ -39,6 +50,11 @@
     font-size: 1em !important;
 
 }
-.tf-tree li ul{
 
+@media (max-width: 768px) {
+    .tf-tree{
+        left: 0;
+        width: 100vw;
+        font-size: 1.1em;
+    }
 }

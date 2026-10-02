@@ -1,0 +1,11 @@
+.monogram{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f5f6fa;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+    user-select: none;
+}

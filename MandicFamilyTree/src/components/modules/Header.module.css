@@ -1,45 +1,187 @@
-header{
-
-    /* border-radius: 10px;  */
-    position: relative;
-    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
-    padding: 0px;
-    margin-left: -0.4vw;
-    margin-top: -0.8vh;
-    /* background-color: hsl(159, 43%, 59%); */
-    background-image: linear-gradient(220deg,hsl(159, 71%, 70%), hsl(158, 34%, 35%));
-    width: 100vw;
-    z-index: 4;
-    
-}
-header ul{
+.header{
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    height: var(--header-h);
     display: flex;
-    gap: 2rem;
-    list-style-type: none;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    padding: 0 22px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mark{
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.dot{
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    flex-shrink: 0;
+}
+
+.nav{
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.navList{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
 }
-li{
 
+.navLink{
+    display: inline-flex;
+    align-items: center;
+    height: var(--header-h);
+    padding: 0 14px;
+    color: var(--sub);
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s ease, border-color 0.15s ease;
 }
-ul:hover{
+
+.navLink:hover{
+    color: var(--ink);
+}
+
+.userMenu{
+    position: relative;
+    flex-shrink: 0;
+    outline: none;
+}
+
+.greeting{
+    display: inline-flex;
+    align-items: center;
+    height: var(--header-h);
+    padding: 0 14px;
+    color: var(--sub);
+    font-size: 0.86rem;
+    white-space: nowrap;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease;
+}
+
+.userMenu:hover .greeting,
+.userMenu:focus-within .greeting{
+    color: var(--ink);
+}
+
+.userDropdown{
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 140px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    z-index: 50;
+}
+
+.userMenu:hover .userDropdown,
+.userMenu:focus-within .userDropdown{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdownItem{
+    display: block;
+    padding: 8px 12px;
+    color: var(--sub);
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.dropdownItem:hover{
+    color: var(--ink);
+    background: var(--bg);
+}
+
+.langToggle{
+    display: flex;
+    flex-shrink: 0;
+    gap: 2px;
+    margin-left: 12px;
+    padding: 2px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+}
+
+.langBtn{
+    border: none;
+    background: transparent;
+    color: var(--sub);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 4px 8px;
+    border-radius: 6px;
     cursor: pointer;
 }
-a{
-    color: white;
-    display: block;
-    text-align: center;
-    border-radius: 0px;
-    padding: 35px;
-    text-decoration: none;
-    font-size:medium;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+
+.langBtn:hover{
+    color: var(--ink);
 }
-a:hover {
-    background-color:  hsl(159, 33%, 49%);
-    border-radius: 100px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
+
+.langBtnActive{
+    background: var(--accent);
+    color: var(--accent-ink);
+}
+
+.langBtnActive:hover{
+    color: var(--accent-ink);
+}
+
+@media (max-width: 768px) {
+    .header{
+        padding: 0 12px;
+        gap: 10px;
+    }
+    .markText{
+        display: none;
+    }
+    .navLink, .greeting{
+        padding: 0 10px;
+        font-size: 0.8rem;
+    }
 }

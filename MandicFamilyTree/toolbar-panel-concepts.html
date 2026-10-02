@@ -1,0 +1,727 @@
+<title>Side Panel Concepts</title>
+<style>
+  :root{
+    --bg:#0c0e13;
+    --surface:#14171e;
+    --surface-raised:#1b1f28;
+    --ink:#e7e9ee;
+    --sub:#868c99;
+    --line:#262b36;
+    --accent:#e3a13b;
+    --accent-ink:#141414;
+    --accent-soft:rgba(227,161,59,.14);
+    --accent2:#6c7bd8;
+    --accent2-soft:rgba(108,123,216,.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    padding-inline:20px;
+    padding-block:28px 60px;
+  }
+  h1,h2,h3{font-family:'Unbounded', system-ui, sans-serif; margin:0; text-wrap:balance;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  img{max-width:100%;}
+  [hidden]{display:none !important;}
+  button{font-family:inherit;}
+
+  /* ---------- intro ---------- */
+  .wrap{max-width:1180px; margin:0 auto;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+  .intro h1{font-size:clamp(1.5rem,3vw,2.1rem); font-weight:600; margin-bottom:10px;}
+  .intro p{color:var(--sub); font-size:.95rem; line-height:1.6; max-width:66ch; margin:0 0 22px;}
+
+  /* ---------- tabs ---------- */
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:28px;
+    position:sticky;
+    top:0;
+    padding-block:12px;
+    background:var(--bg);
+    z-index:5;
+    border-bottom:1px solid var(--line);
+  }
+  .tab{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    color:var(--sub);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:9px 16px;
+    cursor:pointer;
+    transition:color .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .tab:hover{color:var(--ink); border-color:var(--accent);}
+  .tab:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .tab[aria-selected="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  .tab .n{opacity:.6; margin-right:7px;}
+
+  .screen{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:0;
+    overflow:hidden;
+  }
+  .screen-head{
+    padding:18px 24px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .screen-head h2{font-size:1.1rem; font-weight:500;}
+  .screen-head p{margin:4px 0 0; color:var(--sub); font-size:.85rem; max-width:58ch;}
+  .demo-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem;
+    font-weight:600;
+    letter-spacing:.03em;
+    color:var(--ink);
+    background:var(--surface-raised);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:7px 12px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .demo-btn:hover{border-color:var(--accent); color:var(--accent);}
+  .stage{
+    position:relative;
+    background:var(--bg);
+    min-height:560px;
+    overflow:hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+  }
+
+  /* ================= mock tree backdrop (shared) ================= */
+  .mockTree{
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:34px 34px;
+    opacity:.35;
+  }
+  .mockNode{
+    position:absolute;
+    border-radius:50%;
+    background:var(--surface-raised);
+    border:1px solid var(--line);
+  }
+  .mockNode.hovered{
+    border-color:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft);
+  }
+  .mockLabel{
+    position:absolute;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.65rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--sub);
+    background:var(--bg);
+    padding:2px 7px;
+    border-radius:5px;
+    border:1px solid var(--line);
+  }
+
+  /* ================= shared avatar / dwell bits ================= */
+  .avatar{
+    border-radius:50%;
+    background:linear-gradient(135deg,#5b6a9e,#3c4568);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#f5f6fa;
+    font-family:'Unbounded', system-ui, sans-serif;
+    font-weight:600;
+    flex-shrink:0;
+  }
+  .actionRow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:9px 11px;
+    color:var(--ink);
+    font-size:.82rem;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .actionRow:hover{border-color:var(--accent); color:var(--accent); background:var(--accent-soft);}
+  .actionRow .ic{
+    width:16px; height:16px; flex-shrink:0; opacity:.85;
+  }
+  .ghostTile{
+    border:1px dashed var(--line);
+    border-radius:6px;
+    background:transparent;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--sub);
+    font-size:1rem;
+  }
+
+  /* ========================================================
+     1. FLOATING CARD
+     ======================================================== */
+  #stage-card .mockTree{ opacity:.35; }
+  .fc-panel{
+    position:absolute;
+    top:28px; left:28px; bottom:28px;
+    width:252px;
+    background:var(--surface-raised);
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+    padding:40px 18px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .fc-avatarWrap{
+    position:absolute;
+    top:-34px; left:50%;
+    transform:translateX(-50%);
+    width:84px; height:84px;
+  }
+  .fc-ring{
+    position:absolute; inset:0;
+    border-radius:50%;
+  }
+  .fc-ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .fc-ring circle{
+    fill:none;
+    stroke-width:3;
+  }
+  .fc-ring .track{ stroke:var(--line); }
+  .fc-ring .fill{
+    stroke:var(--accent);
+    stroke-linecap:round;
+    stroke-dasharray:226;
+    stroke-dashoffset:226;
+  }
+  .fc-panel.is-pinned .fc-ring .fill{ stroke-dashoffset:0; transition:stroke-dashoffset .3s ease; }
+  .fc-panel:not(.is-pinned) .fc-ring .fill{ animation:fcDwell 2000ms linear forwards; }
+  @keyframes fcDwell{ to{ stroke-dashoffset:0; } }
+  .fc-avatar{
+    position:absolute; inset:6px;
+    width:72px; height:72px;
+    font-size:1.5rem;
+    border:2px solid var(--surface-raised);
+  }
+  .fc-close{
+    position:absolute;
+    top:10px; right:10px;
+    width:24px; height:24px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--sub);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .fc-panel.is-pinned .fc-close{ display:flex; }
+  .fc-body{ text-align:center; margin-top:6px; }
+  .fc-name{ font-family:'Unbounded', system-ui, sans-serif; font-weight:600; font-size:1rem; }
+  .fc-note{ color:var(--sub); font-size:.8rem; margin-top:4px; line-height:1.4; }
+  .fc-actions{ display:flex; flex-direction:column; gap:7px; }
+  .fc-galleryLabel{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.64rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--sub);
+    margin-top:2px;
+  }
+  .fc-filmstrip{
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    padding-bottom:2px;
+  }
+  .fc-filmstrip .tile{
+    width:48px; height:48px;
+    flex-shrink:0;
+    border-radius:8px;
+    background:var(--surface);
+    border:1px solid var(--line);
+  }
+  .fc-filmstrip .ghostTile{ width:48px; height:48px; border-radius:8px; }
+
+  /* ========================================================
+     2. COMPACT RAIL -> EXPAND
+     ======================================================== */
+  .cr-rail{
+    position:absolute;
+    top:0; left:0; bottom:0;
+    width:64px;
+    background:var(--surface-raised);
+    border-right:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding-top:26px;
+    gap:14px;
+    transition:width .3s ease;
+    overflow:hidden;
+    z-index:2;
+  }
+  .cr-rail.is-expanded{ width:260px; align-items:stretch; padding:26px 16px; }
+  .cr-chip{
+    width:44px; height:44px;
+    border-radius:50%;
+    position:relative;
+    flex-shrink:0;
+  }
+  .cr-rail.is-expanded .cr-chip{ align-self:center; width:72px; height:72px; }
+  .cr-chip .fc-ring{ position:absolute; inset:-4px; }
+  .cr-chip .avatar{ position:absolute; inset:0; font-size:1rem; }
+  .cr-rail.is-expanded .cr-chip .avatar{ font-size:1.4rem; }
+  .cr-rail:not(.is-expanded) .cr-chip .fc-ring .fill{ animation:fcDwell 2000ms linear forwards; }
+  .cr-rail.is-expanded .cr-chip .fc-ring .fill{ stroke-dashoffset:0; }
+  .cr-hint{
+    writing-mode:vertical-rl;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.6rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--sub);
+    margin-top:auto;
+    margin-bottom:18px;
+  }
+  .cr-rail.is-expanded .cr-hint{ display:none; }
+  .cr-detail{
+    display:none;
+    flex-direction:column;
+    gap:12px;
+    margin-top:14px;
+  }
+  .cr-rail.is-expanded .cr-detail{ display:flex; }
+  .cr-rail.is-expanded .cr-close{
+    position:absolute; top:10px; right:10px;
+    width:22px; height:22px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--sub);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+
+  /* ========================================================
+     3. TABBED DRAWER
+     ======================================================== */
+  .td-panel{
+    position:absolute;
+    top:20px; left:20px; bottom:20px;
+    width:260px;
+    background:var(--surface-raised);
+    border:1px solid var(--line);
+    border-radius:0 16px 16px 0;
+    box-shadow:10px 0 30px rgba(0,0,0,.45);
+    display:flex;
+    flex-direction:column;
+  }
+  .td-head{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:16px 16px 14px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  .td-head .avatar{ width:46px; height:46px; font-size:1rem; }
+  .td-headText .fc-name{ font-size:.88rem; text-align:left; }
+  .td-headText .fc-note{ font-size:.74rem; text-align:left; margin-top:2px; }
+  .td-loadBar{
+    position:absolute;
+    left:0; right:0; top:0;
+    height:3px;
+    background:var(--line);
+    overflow:hidden;
+  }
+  .td-loadBar .fill{
+    height:100%; width:0%;
+    background:var(--accent);
+    animation:tdFill 2000ms linear forwards;
+  }
+  @keyframes tdFill{ to{ width:100%; } }
+  .td-segment{
+    display:flex;
+    margin:12px 16px 0;
+    border:1px solid var(--line);
+    border-radius:9px;
+    overflow:hidden;
+  }
+  .td-segment button{
+    flex:1;
+    background:transparent;
+    border:none;
+    color:var(--sub);
+    font-size:.74rem;
+    font-weight:600;
+    padding:7px 0;
+    cursor:pointer;
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:.03em;
+  }
+  .td-segment button.active{ background:var(--accent); color:var(--accent-ink); }
+  .td-pane{ padding:14px 16px 16px; display:flex; flex-direction:column; gap:8px; flex:1; overflow-y:auto; }
+  .td-pane[hidden]{ display:none; }
+  .td-actionsGrid{ display:grid; grid-template-columns:1fr; gap:8px; }
+  .td-galleryGrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+  .td-galleryGrid .tile{ aspect-ratio:1; border-radius:7px; background:var(--surface); border:1px solid var(--line); }
+  .td-galleryGrid .ghostTile{ aspect-ratio:1; border-radius:7px; }
+
+  /* ========================================================
+     4. CONTEXTUAL POPOVER
+     ======================================================== */
+  .cp-panel{
+    position:absolute;
+    width:236px;
+    background:var(--surface-raised);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:0 18px 44px rgba(0,0,0,.5);
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .cp-panel::before{
+    content:"";
+    position:absolute;
+    left:-8px; top:34px;
+    width:16px; height:16px;
+    background:var(--surface-raised);
+    border-left:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    transform:rotate(45deg);
+  }
+  .cp-topRow{ display:flex; align-items:center; gap:10px; position:relative; }
+  .cp-topRow .avatar{ width:42px; height:42px; font-size:.9rem; }
+  .cp-ring{ position:absolute; inset:-3px; pointer-events:none; }
+  .cp-headText .fc-name{ font-size:.84rem; text-align:left; }
+  .cp-headText .fc-note{ font-size:.72rem; text-align:left; margin-top:1px; }
+  .cp-pin{
+    margin-left:auto;
+    width:20px; height:20px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--sub);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .cp-panel.is-pinned .cp-pin{ display:flex; }
+  .cp-actions{ display:flex; flex-direction:column; gap:6px; }
+  .cp-actions .actionRow{ padding:7px 9px; font-size:.76rem; }
+  .cp-gallery{ display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+  .cp-gallery .tile{ aspect-ratio:1; border-radius:6px; background:var(--surface); border:1px solid var(--line); }
+  .cp-gallery .ghostTile{ aspect-ratio:1; border-radius:6px; font-size:.8rem; }
+
+  .note{ color:var(--sub); font-size:.85rem; margin-top:26px; text-align:center; }
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <div class="eyebrow">Home tree — side panel</div>
+    <h1>Side panel redesign concepts</h1>
+    <p>
+      Four directions for the hover/pin panel on the tree page. Each keeps every current piece of
+      behaviour: the 2s dwell indicator that fills while you hover a person, pinning so it stays open
+      once dwelled (with a way to close it again), the photo, name and note, the three actions
+      (Person Profile / Focus / Add Offspring), and the gallery. Click "Preview dwell → pin" on any
+      screen to see the fill-and-pin motion play out.
+    </p>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Side panel concepts">
+    <button class="tab" role="tab" aria-selected="true" data-target="card"><span class="n">01</span>Floating Card</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="rail"><span class="n">02</span>Compact Rail</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="tabs"><span class="n">03</span>Tabbed Drawer</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="popover"><span class="n">04</span>Contextual Popover</button>
+  </div>
+
+  <!-- ============ 1. FLOATING CARD ============ -->
+  <section class="screen" id="panel-card">
+    <div class="screen-head">
+      <div>
+        <h2>01 — Floating Card</h2>
+        <p>The panel lifts off the screen edge into a detached, rounded card with margin all around. The avatar becomes a badge overlapping the top edge, with the dwell timer drawn as a ring around it instead of a bar. Actions read as a clean vertical stack of rows; the gallery becomes a horizontal filmstrip so it never fights the actions for height.</p>
+      </div>
+      <button class="demo-btn" data-demo="card">Preview dwell → pin</button>
+    </div>
+    <div class="stage" id="stage-card">
+      <div class="mockTree"></div>
+      <div class="mockNode hovered" style="width:46px;height:46px; left:360px; top:250px;"></div>
+      <div class="mockLabel" style="left:340px; top:308px;">hovered node</div>
+
+      <div class="fc-panel" id="fc-demo">
+        <button class="fc-close" title="Close">×</button>
+        <div class="fc-avatarWrap">
+          <div class="fc-ring">
+            <svg viewBox="0 0 80 80">
+              <circle class="track" cx="40" cy="40" r="36"/>
+              <circle class="fill" cx="40" cy="40" r="36"/>
+            </svg>
+          </div>
+          <div class="fc-avatar avatar">DM</div>
+        </div>
+        <div class="fc-body">
+          <div class="fc-name">Dejan Mandić</div>
+          <div class="fc-note">The GOAT</div>
+        </div>
+        <div class="fc-actions">
+          <div class="actionRow"><span class="ic">◧</span>Person Profile</div>
+          <div class="actionRow"><span class="ic">◎</span>Focus</div>
+          <div class="actionRow"><span class="ic">+</span>Add Offspring</div>
+        </div>
+        <div>
+          <div class="fc-galleryLabel">Gallery</div>
+          <div class="fc-filmstrip">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="ghostTile">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. COMPACT RAIL ============ -->
+  <section class="screen" id="panel-rail" hidden>
+    <div class="screen-head">
+      <div>
+        <h2>02 — Compact Rail → Expand</h2>
+        <p>A slim 64px rail sits at the edge at all times, so the page never feels empty-left when no one's hovered. Hovering a node lights a small avatar chip on the rail with the dwell ring around it; dwelling expands the rail outward into the full panel in place, rather than sliding a whole new panel over the canvas.</p>
+      </div>
+      <button class="demo-btn" data-demo="rail">Preview dwell → pin</button>
+    </div>
+    <div class="stage" id="stage-rail">
+      <div class="mockTree"></div>
+      <div class="mockNode hovered" style="width:46px;height:46px; left:420px; top:250px;"></div>
+      <div class="mockLabel" style="left:400px; top:308px;">hovered node</div>
+
+      <div class="cr-rail" id="cr-demo">
+        <button class="cr-close">×</button>
+        <div class="cr-chip">
+          <div class="fc-ring">
+            <svg viewBox="0 0 80 80">
+              <circle class="track" cx="40" cy="40" r="36"/>
+              <circle class="fill" cx="40" cy="40" r="36"/>
+            </svg>
+          </div>
+          <div class="avatar">DM</div>
+        </div>
+        <div class="cr-hint">hover · dwell to pin</div>
+        <div class="cr-detail">
+          <div class="fc-body" style="margin-top:0;">
+            <div class="fc-name">Dejan Mandić</div>
+            <div class="fc-note">The GOAT</div>
+          </div>
+          <div class="fc-actions">
+            <div class="actionRow"><span class="ic">◧</span>Person Profile</div>
+            <div class="actionRow"><span class="ic">◎</span>Focus</div>
+            <div class="actionRow"><span class="ic">+</span>Add Offspring</div>
+          </div>
+          <div>
+            <div class="fc-galleryLabel">Gallery</div>
+            <div class="td-galleryGrid" style="margin-top:7px;">
+              <div class="tile"></div>
+              <div class="tile"></div>
+              <div class="ghostTile">+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. TABBED DRAWER ============ -->
+  <section class="screen" id="panel-tabs" hidden>
+    <div class="screen-head">
+      <div>
+        <h2>03 — Tabbed Drawer</h2>
+        <p>Keeps today's fixed edge-drawer shape, but compresses the header into one row (avatar + name/note side by side) and splits Actions and Gallery into a segmented switch below it. Good for people with a lot of photos — the gallery gets its own full-height scroll area instead of competing with the action list for room.</p>
+      </div>
+      <button class="demo-btn" data-demo="tabsdemo">Preview dwell → pin</button>
+    </div>
+    <div class="stage" id="stage-tabs">
+      <div class="mockTree"></div>
+      <div class="mockNode hovered" style="width:46px;height:46px; left:360px; top:250px;"></div>
+      <div class="mockLabel" style="left:340px; top:308px;">hovered node</div>
+
+      <div class="td-panel" id="td-demo">
+        <div class="td-head">
+          <div class="td-loadBar"><div class="fill"></div></div>
+          <div class="avatar">DM</div>
+          <div class="td-headText">
+            <div class="fc-name">Dejan Mandić</div>
+            <div class="fc-note">The GOAT</div>
+          </div>
+        </div>
+        <div class="td-segment">
+          <button class="active" data-pane="actions">Actions</button>
+          <button data-pane="gallery">Gallery</button>
+        </div>
+        <div class="td-pane" data-pane-content="actions">
+          <div class="td-actionsGrid">
+            <div class="actionRow"><span class="ic">◧</span>Person Profile</div>
+            <div class="actionRow"><span class="ic">◎</span>Focus</div>
+            <div class="actionRow"><span class="ic">+</span>Add Offspring</div>
+          </div>
+        </div>
+        <div class="td-pane" data-pane-content="gallery" hidden>
+          <div class="td-galleryGrid">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="ghostTile">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. CONTEXTUAL POPOVER ============ -->
+  <section class="screen" id="panel-popover" hidden>
+    <div class="screen-head">
+      <div>
+        <h2>04 — Contextual Popover</h2>
+        <p>Instead of a fixed spot on the screen edge, the panel detaches and anchors right next to whichever bubble is hovered, with a small pointer tail connecting them — so the connection between panel and person stays obvious even while panning. Dwelling pins it in place with a close button; it's deliberately the most compact of the four, trading gallery size for staying out of the way of the tree itself.</p>
+      </div>
+      <button class="demo-btn" data-demo="popover">Preview dwell → pin</button>
+    </div>
+    <div class="stage" id="stage-popover">
+      <div class="mockTree"></div>
+      <div class="mockNode hovered" style="width:46px;height:46px; left:300px; top:260px;"></div>
+
+      <div class="cp-panel" id="cp-demo" style="left:364px; top:230px;">
+        <button class="cp-pin" title="Close">×</button>
+        <div class="cp-topRow">
+          <div class="cp-ring">
+            <svg viewBox="0 0 48 48" style="width:48px;height:48px;">
+              <circle class="track" cx="24" cy="24" r="21"/>
+              <circle class="fill" cx="24" cy="24" r="21" stroke-dasharray="132" stroke-dashoffset="132"/>
+            </svg>
+          </div>
+          <div class="avatar">DM</div>
+          <div class="cp-headText">
+            <div class="fc-name">Dejan Mandić</div>
+            <div class="fc-note">The GOAT</div>
+          </div>
+        </div>
+        <div class="cp-actions">
+          <div class="actionRow"><span class="ic">◧</span>Person Profile</div>
+          <div class="actionRow"><span class="ic">◎</span>Focus</div>
+          <div class="actionRow"><span class="ic">+</span>Add Offspring</div>
+        </div>
+        <div>
+          <div class="fc-galleryLabel">Gallery</div>
+          <div class="cp-gallery" style="margin-top:6px;">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="ghostTile">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="note">Pick a direction — or mix pieces (e.g. the Rail's always-present edge with the Drawer's tabbed gallery) — and I'll build the real thing against the live hover/pin logic.</footer>
+</div>
+
+<script>
+(function(){
+  var tabs = document.querySelectorAll('.tab');
+  var panels = {
+    card: document.getElementById('panel-card'),
+    rail: document.getElementById('panel-rail'),
+    tabs: document.getElementById('panel-tabs'),
+    popover: document.getElementById('panel-popover')
+  };
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var target = tab.getAttribute('data-target');
+      tabs.forEach(function(t){ t.setAttribute('aria-selected', String(t === tab)); });
+      Object.keys(panels).forEach(function(key){
+        panels[key].hidden = key !== target;
+      });
+    });
+  });
+
+  // Segmented control inside the Tabbed Drawer concept.
+  var segButtons = document.querySelectorAll('.td-segment button');
+  segButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var pane = btn.getAttribute('data-pane');
+      segButtons.forEach(function(b){ b.classList.toggle('active', b === btn); });
+      document.querySelectorAll('.td-pane').forEach(function(p){
+        p.hidden = p.getAttribute('data-pane-content') !== pane;
+      });
+    });
+  });
+
+  // "Preview dwell -> pin" buttons: replay the fill animation, then pin.
+  function replay(el, className){
+    el.classList.remove(className);
+    void el.offsetWidth; // restart CSS animation
+    el.classList.remove('is-pinned', 'is-expanded');
+    void el.offsetWidth;
+    setTimeout(function(){
+      el.classList.add(className);
+    }, 2000);
+  }
+  document.querySelectorAll('.demo-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var which = btn.getAttribute('data-demo');
+      if (which === 'card') replay(document.getElementById('fc-demo'), 'is-pinned');
+      if (which === 'rail') replay(document.getElementById('cr-demo'), 'is-expanded');
+      if (which === 'popover') replay(document.getElementById('cp-demo'), 'is-pinned');
+      if (which === 'tabsdemo'){
+        var bar = document.querySelector('#td-demo .td-loadBar .fill');
+        bar.style.animation = 'none';
+        void bar.offsetWidth;
+        bar.style.animation = 'tdFill 2000ms linear forwards';
+      }
+    });
+  });
+})();
+</script>

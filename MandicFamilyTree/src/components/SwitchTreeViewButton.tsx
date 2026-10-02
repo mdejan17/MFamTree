@@ -1,21 +1,17 @@
-import type { MouseEvent, SyntheticEvent } from 'react';
-import styless from './modules/Button.module.css'
-import stylesDom from '../dom/modules/Home.module.css'
+import styles from './modules/Button.module.css'
+import { useLocale } from '../i18n/LocaleContext.tsx'
 
-function SwitchTreeViewButton() {
-    let clickHandler = undefined;
-    clickHandler = (e:any) => {
-        console.log(document.getElementById(stylesDom.textViewTree)?.style.display);
-        if (document.getElementById(stylesDom.textViewTree)?.style.display == 'none'){
-            document.getElementById(stylesDom.cardViewTree)!.style.display='none';
-            document.getElementById(stylesDom.textViewTree)!.style.display='block';
-        }else{
-            document.getElementById(stylesDom.cardViewTree)!.style.display='block';
-            document.getElementById(stylesDom.textViewTree)!.style.display='none';
-        }
+interface SwitchTreeViewButtonProps {
+    viewMode: 'card' | 'text';
+    onToggle: () => void;
 }
-    const doubleClickHandler = (e:any) => {}
+
+function SwitchTreeViewButton({ viewMode, onToggle }: SwitchTreeViewButtonProps) {
+    const { t } = useLocale();
     return(
-        <button className={styless.button} id={styless.changeViewButton} onDoubleClick={(e) => doubleClickHandler(e)} onClick={(e) => clickHandler(e)}>Change View</button>)
+        <button className={styles.btn} onClick={onToggle}>
+            {viewMode === 'card' ? t('home.switchToTextView') : t('home.switchToCardView')}
+        </button>
+    )
 }
 export default SwitchTreeViewButton

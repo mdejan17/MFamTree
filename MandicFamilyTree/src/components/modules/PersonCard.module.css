@@ -1,61 +1,93 @@
 @keyframes popIn {
     0% {
       opacity: 0;
-      transform: scale(0.1) translateY(30px);
-    }
-    60% {
-      opacity: 1;
-      transform: scale(1.1) translateY(-8px);
+      transform: scale(0.9) translateY(10px);
     }
     100% {
       opacity: 1;
-      transform: scale(1) translateY(0) opacity(1);;
+      transform: scale(1) translateY(0);
     }
-  }
-.card{
-    border: 1px solid hsl(0, 0%, 80%);
-    border-radius: 10px;
-    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
-    padding: 20px;
-    margin: 10px;
-    text-align: center;
-    max-width: 250px;
-    display: inline-block;
-    cursor: pointer;
-    transition: filter 0.5s ease 0.1s;
-    width: 100px;
-    opacity: 0;
-    height: 120px;
-    pointer-events: all !important;
-    animation: popIn 0.9s ease-out forwards;  
-    animation-delay: 0.2s;
+}
 
-}
-.card:hover{
-    background-color: rgba(54, 54, 54, 0.137);
-    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
-}
-.card:click{
-    display: inline-block;
-}
-.card:active{
-    filter: drop-shadow(0 0 0 rgb(70, 131, 180));
-    transition: filter 0s;
-}
-.personCardImg{
-    max-width: 40%;
-    height: auto;
-    border-radius: 50%;
-    margin-bottom: 10px;
-}
-.personCardTitle{
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 1em;
+.card{
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    padding: 16px 12px;
     margin: 0;
-    color: rgba(0, 0, 0, 0.8);
+    text-align: center;
+    width: 100%;
+    max-width: 160px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+    animation: popIn 0.25s ease-out;
 }
+
+.reviewBadge{
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    line-height: 1.4;
+}
+
+.card:hover{
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.card:active{
+    transform: translateY(0) scale(0.98);
+}
+
+.personCardImg{
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    margin-bottom: 10px;
+    background: var(--surface-raised);
+}
+
+/* The <img> case centers via the card's text-align:center (images are
+   inline by default). The monogram-avatar <div> is block-level even
+   with display:flex, so it needs an explicit auto margin to center —
+   scoped here (not on the shared PersonAvatar component) so it doesn't
+   leak into the flex-row list view, where PersonAvatar is left-aligned
+   by design. */
+.cardAvatar{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.personCardTitle{
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.86rem;
+    margin: 0;
+    color: var(--ink);
+}
+
 .personCardText{
-    font-size: 0.1em;
-    font-family: Arial, Helvetica, sans-serif;
-    color: rgba(0, 0, 0, 0.7);
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    color: var(--sub);
+    margin: 4px 0 0;
+    height: 1em;
+    line-height: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

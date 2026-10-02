@@ -1,0 +1,495 @@
+/* Constellation layout — deliberately not a diagram: nodes float on a dark
+   field, connected by thin glowing lines, rather than right-angled dashed
+   connectors in neat rows (that's the Home tree's language, not this
+   page's). See FamTree.tsx for the layout math. */
+
+/* No reserved left lane on this page any more — hover info now floats as
+   a Contextual Popover next to whichever bubble you're on (see
+   ContextualPopover.tsx), not a fixed side panel, so the stage can use
+   the full width. No outer padding either — the starfield/canvas now runs
+   edge-to-edge, flush against the header and footer, the same as the Home
+   tree view; individual bubbles still keep their own margin from the edge
+   via clampPct in FamTree.tsx, so nothing actually renders under the
+   header/footer itself. */
+.focusWrap{
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.statusMessage{
+    display: block;
+    padding: 24px;
+    color: var(--sub);
+    font-style: italic;
+}
+
+.starfield{
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* Hosts the wheel listener (attached imperatively, see FamTree.tsx) and the
+   whole-view pan gesture — a drag starting here (empty stage background)
+   pans the camera; a drag starting on a bubble stops its pointerdown from
+   bubbling up to this element, so it moves that bubble instead (see
+   handleNodePointerDown). Clips panned/zoomed content to the visible area. */
+.viewport{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+
+.viewport:active{
+    cursor: grabbing;
+}
+
+/* The pan/zoom transform lives here, one level above .stage, because
+   .stage already has its own mount-animation transform (see
+   constellationIn below) — stacking a second, frequently-changing inline
+   transform on the same element would fight that animation's `both`
+   fill-mode once it finishes.
+   No will-change here (deliberately) — it was hinting the browser to
+   promote this to its own GPU layer, cached at a fixed resolution and then
+   bitmap-scaled on every zoom change, which is exactly what was making
+   photos and lines alike look soft/blurry once zoomed in on a larger
+   screen. Without it, zooming repaints at the new resolution instead. */
+.canvas{
+    width: 100%;
+    height: 100%;
+    transform-origin: center center;
+}
+
+/* No width cap any more — bubbles are laid out by percentage (see
+   resolveStaticOverlaps/NOMINAL_RECT_W in FamTree.tsx, which use a fixed
+   980x560 nominal unit space purely as an internal reference for the
+   collision math, independent of how wide this actually renders), so
+   letting the stage fill the whole viewport just gives them the full
+   width to spread across instead of being confined to a narrow centered
+   column. */
+.stage{
+    position: relative;
+    min-height: 560px;
+    height: 100%;
+    animation: constellationIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.zoomControls{
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.zoomBtn{
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--surface-raised);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.zoomBtn:hover{
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.zoomBtn:active{
+    transform: scale(0.92);
+}
+
+/* Re-keyed on focus change (see FamTree.tsx) so this replays whenever the
+   user recenters on a different person — reads as zooming into the next
+   cluster of stars rather than the view just snapping to new content. */
+@keyframes constellationIn{
+    from{
+        opacity: 0;
+        transform: scale(0.94);
+        filter: blur(2px);
+    }
+    to{
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .stage{
+        animation: none;
+    }
+    .node{
+        transition: none;
+    }
+    .circle{
+        transition: none;
+    }
+    .nodeEnter, .link, .linkDim, .bond{
+        animation: none;
+    }
+}
+
+.linkLayer{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* linkLayer's viewBox is a square "0 0 100 100" stretched non-uniformly
+   (preserveAspectRatio="none") to match .stage's actual, usually-not-square
+   box — necessary so each line's endpoints (plain 0-100 percentages) land
+   on the same spot as the bubbles they connect, which are positioned the
+   same way via left%/top%. Left alone, that non-uniform stretch also
+   distorts the STROKE itself (worse the wider the stage renders, which is
+   most of the time now — see .stage above), rendering it sub-pixel-thin
+   along one axis and antialiasing into a blurry, washed-out line instead of
+   a crisp one. vector-effect: non-scaling-stroke opts the stroke itself out
+   of that distortion (and out of the outer pan/zoom transform), so these
+   are specified in real, constant CSS pixels and always render crisp —
+   trading "lines get chunkier as you zoom in" for "lines are always sharp
+   regardless of zoom or stage size", which reads better for thin
+   connector lines than bigger-but-blurry ones would. */
+.link{
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.1px;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 18 30;
+    opacity: 0.55;
+    filter: drop-shadow(0 0 2px rgba(227, 161, 59, 0.65));
+    animation: linkDrawIn 0.5s ease both;
+}
+
+.linkDim{
+    stroke: var(--line);
+    stroke-dasharray: 14 24;
+    opacity: 0.8;
+    filter: none;
+    animation: linkDimDrawIn 0.5s ease both;
+}
+
+.bond{
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 0.9px;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 18 30;
+    opacity: 0.4;
+    filter: drop-shadow(0 0 2px rgba(227, 161, 59, 0.65));
+    animation: bondDrawIn 0.5s ease both;
+}
+
+/* Lines are effectively brand-new SVG elements on every focus change (their
+   key/shape depends on the uid pair they connect), so a plain mount
+   animation — no uid-matching needed — is enough to read as "being drawn"
+   each time the focus recenters. Each class animates to its own resting
+   opacity since .link/.linkDim/.bond don't share one. */
+@keyframes linkDrawIn{
+    from{ opacity: 0; stroke-width: 0; }
+    to{ opacity: 0.55; stroke-width: 1.1px; }
+}
+@keyframes linkDimDrawIn{
+    from{ opacity: 0; }
+    to{ opacity: 0.8; }
+}
+@keyframes bondDrawIn{
+    from{ opacity: 0; stroke-width: 0; }
+    to{ opacity: 0.4; stroke-width: 0.9px; }
+}
+
+.star{
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #4b5366;
+    pointer-events: none;
+}
+
+.node{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    max-width: 120px;
+    /* The same uid keeps the same <button> across a focus change (see
+       FamTree.tsx's unified visNodes list) even when its role — and so its
+       left/top — changes, e.g. the old focus sliding up into the parents
+       row. That reuse is what lets this transition actually animate instead
+       of snapping. */
+    transition: left 1s cubic-bezier(0.22, 1, 0.36, 1), top 1s cubic-bezier(0.22, 1, 0.36, 1);
+    /* Bubbles are individually draggable (see FamTree.tsx's pointer
+       handlers) — this stops a touch-drag from also scrolling the page, and
+       the cursor hints that a drag (not just a click) is available. */
+    touch-action: none;
+    cursor: grab;
+}
+
+button.node:active{
+    cursor: grabbing;
+}
+
+/* While a bubble is actively being dragged, its position must track the
+   pointer exactly — the left/top transition above (meant for focus-change
+   slides) would otherwise make it visibly lag behind the cursor. */
+/* Applied for as long as a bubble's position is being driven imperatively —
+   mid-drag, and then through the JS-tweened snap-back afterward (see
+   FamTree.tsx) — so the CSS left/top transition (meant only for
+   focus-change slides) doesn't fight either of those every frame. */
+.dragging{
+    transition: none;
+    z-index: 3;
+}
+
+/* Raised above its neighbors on hover too — otherwise growing a bubble that
+   overlaps another (the focus couple, a tightly-packed child fan) would
+   just tuck the bigger version back under whatever's already stacked above
+   it, instead of actually coming forward. */
+.node:hover{
+    z-index: 4;
+}
+
+.node:hover .circle{
+    filter: brightness(1.3);
+    transform: scale(1.32);
+    opacity: 1;
+}
+
+button.node:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 12px;
+}
+
+/* A node with no prior position to slide from (a newly-revealed person,
+   e.g. the new focus's own children) zooms in from the center instead. */
+.nodeEnter{
+    animation: nodeZoomIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes nodeZoomIn{
+    from{
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3);
+    }
+    to{
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.avatarWrap{
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+/* A glossy highlight + falloff laid over the photo/monogram so each bubble
+   reads as a lit sphere rather than a flat disc — a light source top-left,
+   darkening toward the bottom-right edge. mix-blend-mode lets it tint
+   whatever's underneath (photo or monogram color) instead of just sitting
+   on top of it opaquely. Lives on the wrapper (not .circle itself) so it
+   isn't clipped to object-fit's image box and stays independent of
+   PersonAvatar's own markup. */
+.avatarWrap::after{
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0) 45%),
+        radial-gradient(circle at 72% 80%, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.09) 40%, rgba(0, 0, 0, 0) 68%);
+    mix-blend-mode: overlay;
+}
+
+.circle{
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    /* Dimmed a bit relative to the focus couple (see opacity:1 overrides on
+       .circleFocused/.circleSpouse below) so parents and children read as
+       the supporting cast rather than competing with the couple for
+       attention. */
+    opacity: 0.8;
+    /* Outer glow, then two inset shadows that curve the rim — a dark
+       crescent bottom-right (falling away from the light) and a faint
+       bright one top-left (catching it) — for the same sphere read as the
+       .avatarWrap::after highlight above, but baked into the edge itself. */
+    box-shadow:
+        0 0 24px 6px rgba(255, 255, 255, 0.35),
+        inset -6px -6px 10px rgba(0, 0, 0, 0.28),
+        inset 4px 4px 8px rgba(255, 255, 255, 0.12);
+    transition:
+        filter 0.15s ease,
+        transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+        width 1s cubic-bezier(0.22, 1, 0.36, 1),
+        height 1s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.5s ease,
+        opacity 0.3s ease;
+}
+
+.sizeLg{ width: 104px; height: 104px; }
+.sizeMdLg{ width: 60px; height: 60px; }
+.sizeMd{ width: 48px; height: 48px; }
+
+.circleFocused{
+    position: relative;
+    z-index: 2;
+    opacity: 1;
+    box-shadow:
+        0 0 36px 10px rgba(227, 161, 59, 0.55),
+        inset -6px -6px 10px rgba(0, 0, 0, 0.28),
+        inset 4px 4px 8px rgba(255, 255, 255, 0.12);
+}
+
+.circleSpouse{
+    opacity: 1;
+    box-shadow:
+        0 0 30px 8px rgba(255, 255, 255, 0.45),
+        inset -6px -6px 10px rgba(0, 0, 0, 0.28),
+        inset 4px 4px 8px rgba(255, 255, 255, 0.12);
+}
+
+.unlit{
+    background: none !important;
+    border: 1.5px dashed var(--line);
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sub);
+    font-family: var(--font-mono);
+    font-weight: 400;
+}
+
+.reviewDot{
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+}
+
+/* A dashed "orbit" ring around the focus bubble only — its rx/ry/rotation
+   are computed in FamTree.tsx (see orbitRx/orbitRy/orbitAngleDeg) so its
+   near vertex lands exactly on the first spouse's actual center, rather
+   than a fixed guessed angle/size, with a Saturn's-rings flattened
+   ellipse rather than a plain circle. Drawn as an actual SVG ellipse
+   rather than a CSS circle so the tilt (set via inline `transform`, along
+   with the centering translate) can stay fixed while the dashes crawl
+   around it (animating stroke-dashoffset) instead of distorting the shape
+   itself — rotating a non-circular shape continuously would make it
+   flatten to a sliver edge-on twice a turn. The fixed 240x240 viewBox/box
+   is just generously-sized scratch space for whatever rx/ry the spouse
+   distance works out to; left:50%/top:50% plus the inline translate(-50%,
+   -50%) centers it on .avatarWrap regardless of that box size.
+
+   Drawn twice, identically, to fake the ring passing behind the sphere on
+   one side and in front of it on the other: .orbitRingBack sits below the
+   circle in stacking order and is simply occluded by it wherever they
+   overlap (its far/back arc); .orbitRingFront sits above the circle but is
+   clipped down to just its near half, so only the arc that should cross
+   in front actually shows there. */
+.orbitRing{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 240px;
+    height: 240px;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.orbitRingBack{
+    z-index: 1;
+}
+
+.orbitRingFront{
+    z-index: 3;
+    /* Keeps only the bottom half of the ellipse's own (pre-rotation) box —
+       its near arc — clipped in the same rotated frame as the ellipse
+       itself, so the cut follows the tilt instead of a flat horizontal
+       line across the final, rotated shape. */
+    clip-path: inset(50% 0 0 0);
+}
+
+.orbitRing ellipse{
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.55);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 7;
+    animation: orbitDash 6s linear infinite;
+}
+
+@keyframes orbitDash{
+    to{ stroke-dashoffset: -299; }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .orbitRing ellipse{
+        animation: none;
+    }
+}
+
+.label{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.name{
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.82rem;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.years{
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--sub);
+}
+
+.placeholderLabel{
+    font-size: 0.74rem;
+    color: var(--sub);
+    font-style: italic;
+    text-align: center;
+    max-width: 110px;
+}
+

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Tree UI Concepts</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Libre+Franklin:wght@400;500;600;700&family=Sora:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=Unbounded:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --chrome-bg: #f5f5f3;
+    --chrome-ink: #17181a;
+    --chrome-sub: #6b6d72;
+    --chrome-line: #e1e1de;
+    --chrome-accent: #2f5d3a;
+  }
+  *, *::before, *::after{ box-sizing: border-box; }
+  body{
+    margin: 0;
+    background: var(--chrome-bg);
+    color: var(--chrome-ink);
+    font-family: 'Libre Franklin', system-ui, sans-serif;
+    padding: 28px 16px 64px;
+  }
+  .wrap{ max-width: 1180px; margin: 0 auto; }
+  .intro{ margin-bottom: 22px; }
+  .intro h1{
+    font-size: 1.5rem;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .intro p{ margin: 0; color: var(--chrome-sub); font-size: 0.95rem; max-width: 62ch; }
+
+  .tabs{
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+    position: sticky;
+    top: 0;
+    background: var(--chrome-bg);
+    padding: 10px 0;
+    z-index: 50;
+  }
+  .tab{
+    appearance: none;
+    border: 1px solid var(--chrome-line);
+    background: #fff;
+    color: var(--chrome-ink);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    line-height: 1.25;
+    min-width: 168px;
+  }
+  .tab span{ font-weight: 400; color: var(--chrome-sub); font-size: 0.78rem; }
+  .tab[aria-selected="true"]{
+    border-color: var(--chrome-accent);
+    box-shadow: 0 0 0 1px var(--chrome-accent) inset;
+  }
+  .tab[aria-selected="true"] span{ color: var(--chrome-accent); }
+
+  .panel{ display: none; }
+  .panel.active{ display: block; }
+
+  .frame{
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.10);
+    margin-bottom: 28px;
+  }
+  .frame-label{
+    font-size: 0.78rem;
+    color: var(--chrome-sub);
+    margin: 0 0 10px 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* avatar helper used by all three concepts */
+  .av{
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* ============================================================ */
+  /* CONCEPT 1 — "Highland Ledger"                                 */
+  /* Palette: parchment-grey ground, ink-green text, brass accent  */
+  /* Type: Fraunces (display) / Libre Franklin (body) / JetBrains  */
+  /*       Mono (dates, ids)                                       */
+  /* Layout: record-book ledger — ruled rows, tab-divider nav,     */
+  /*         index-card people                                     */
+  /* ============================================================ */
+  .c1{
+    --bg: #eeeadd;
+    --surface: #f7f4ea;
+    --ink: #24301f;
+    --sub: #6e6a56;
+    --line: #d8d1b8;
+    --accent: #9c6b2e;
+    --accent-ink: #fff8ea;
+    --brand-green: #33502e;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Libre Franklin', serif;
+  }
+  .c1 .plate{
+    background: var(--brand-green);
+    color: var(--accent-ink);
+    padding: 18px 26px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    font-family: 'Fraunces', serif;
+  }
+  .c1 .plate .mark{ font-size: 1.3rem; font-weight: 600; letter-spacing: 0.01em; }
+  .c1 .plate nav{ display: flex; gap: 22px; font-family: 'Libre Franklin', sans-serif; font-size: 0.85rem; }
+  .c1 .plate nav a{ color: var(--accent-ink); text-decoration: none; opacity: 0.88; border-bottom: 1px solid transparent; padding-bottom: 2px; }
+  .c1 .plate nav a.current{ opacity: 1; border-color: var(--accent); }
+  .c1 .body{ display: grid; grid-template-columns: 210px 1fr; background: var(--surface); min-height: 420px; }
+  .c1 .rail{ border-right: 1px solid var(--line); padding: 18px 16px; }
+  .c1 .rail .who{ display: flex; gap: 10px; align-items: center; margin-bottom: 18px; }
+  .c1 .rail .who .av{ width: 42px; height: 42px; background: var(--accent); color: var(--accent-ink); font-family: 'Fraunces', serif; }
+  .c1 .rail .who h3{ margin: 0; font-size: 0.95rem; font-family: 'Fraunces', serif; }
+  .c1 .rail .who p{ margin: 2px 0 0; font-size: 0.72rem; color: var(--sub); text-transform: uppercase; letter-spacing: 0.04em; }
+  .c1 .rail .entry{ display: block; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 0.82rem; color: var(--ink); text-decoration: none; border-left: 2px solid transparent; }
+  .c1 .rail .entry.on{ background: var(--bg); border-left-color: var(--accent); font-weight: 600; }
+  .c1 .main{ padding: 20px 26px; }
+  .c1 .main h2{ font-family: 'Fraunces', serif; font-weight: 500; font-size: 1.2rem; margin: 0 0 14px; }
+  .c1 .search{ display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 4px; padding: 8px 12px; margin-bottom: 18px; max-width: 360px; }
+  .c1 .search input{ border: none; outline: none; font: inherit; font-size: 0.88rem; width: 100%; background: transparent; color: var(--ink); }
+  .c1 .search svg{ opacity: 0.5; flex-shrink: 0; }
+  .c1 .ledger-rows{ border-top: 1px solid var(--line); }
+  .c1 .row{ display: grid; grid-template-columns: 28px 1fr 100px 160px; gap: 14px; align-items: center; padding: 11px 4px; border-bottom: 1px solid var(--line); font-size: 0.86rem; }
+  .c1 .row .idx{ font-family: 'JetBrains Mono', monospace; color: var(--sub); font-size: 0.75rem; }
+  .c1 .row .name{ display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .c1 .row .name .av{ width: 28px; height: 28px; font-size: 0.68rem; background: var(--line); color: var(--ink); }
+  .c1 .row .tag{ font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); }
+  .c1 .row .dates{ font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: var(--sub); text-align: right; }
+
+  .c1 .tree{ padding: 30px 26px 36px; }
+  .c1 .gen-label{ font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); text-align: center; margin-bottom: 10px; }
+  .c1 .gen-row{ display: flex; justify-content: center; gap: 36px; position: relative; padding-bottom: 28px; }
+  .c1 .gen-row::after{ content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 28px; background: var(--line); }
+  .c1 .card{ background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; min-width: 150px; }
+  .c1 .card .av{ width: 34px; height: 34px; background: var(--accent); color: var(--accent-ink); font-size: 0.75rem; font-family: 'Fraunces', serif; }
+  .c1 .card .nm{ font-weight: 600; font-size: 0.86rem; }
+  .c1 .card .role{ font-size: 0.68rem; color: var(--sub); text-transform: uppercase; }
+  .c1 .gen-row.children{ gap: 22px; }
+  .c1 .gen-row.children .card{ min-width: 110px; }
+  .c1 .gen-row.children::before{ content:""; position:absolute; top:-28px; left:50%; width:1px; height:28px; background:var(--line); }
+
+  .c1 .modal-stage{ background: var(--bg); padding: 40px 26px; display: flex; justify-content: center; }
+  .c1 .modal{ background: var(--surface); border: 1px solid var(--line); border-radius: 10px; width: 100%; max-width: 420px; padding: 24px 26px; }
+  .c1 .modal h3{ font-family: 'Fraunces', serif; font-weight: 500; margin: 0 0 4px; font-size: 1.15rem; }
+  .c1 .modal .hint{ font-size: 0.78rem; color: var(--sub); margin: 0 0 18px; }
+  .c1 .field{ margin-bottom: 14px; }
+  .c1 .field label{ display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--sub); margin-bottom: 5px; }
+  .c1 .field input, .c1 .field select{ width: 100%; border: none; border-bottom: 1px solid var(--line); background: transparent; padding: 6px 2px; font: inherit; font-size: 0.9rem; color: var(--ink); }
+  .c1 .field.two{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .c1 .actions{ display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  .c1 .btn{ font: inherit; font-size: 0.84rem; font-weight: 600; padding: 9px 18px; border-radius: 5px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+  .c1 .btn.ghost{ background: transparent; color: var(--ink); border-color: var(--line); }
+
+  /* ============================================================ */
+  /* CONCEPT 2 — "Clarity"                                         */
+  /* Palette: near-white surfaces, graphite ink, teal accent       */
+  /* Type: Sora (display) / Work Sans (body) / JetBrains Mono      */
+  /* Layout: app-shell — icon+label rail, elevated card grid,      */
+  /*         orthogonal tree connectors                            */
+  /* ============================================================ */
+  .c2{
+    --bg: #f6f7f8;
+    --surface: #ffffff;
+    --ink: #15181c;
+    --sub: #6b7178;
+    --line: #e4e7ea;
+    --accent: #0d7377;
+    --accent-soft: #e4f3f3;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Work Sans', system-ui, sans-serif;
+  }
+  .c2 .topbar{ display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .c2 .topbar .mark{ font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+  .c2 .topbar .mark .dot{ width: 10px; height: 10px; border-radius: 3px; background: var(--accent); }
+  .c2 .topbar .search{ display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 8px 12px; width: 320px; }
+  .c2 .topbar .search input{ border: none; background: transparent; outline: none; font: inherit; font-size: 0.86rem; width: 100%; color: var(--ink); }
+  .c2 .topbar .search svg{ opacity: 0.45; flex-shrink: 0; }
+  .c2 .topbar .user{ display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+  .c2 .topbar .user .av{ width: 30px; height: 30px; background: var(--accent); color: #fff; font-size: 0.72rem; }
+  .c2 .body{ display: grid; grid-template-columns: 180px 1fr; min-height: 440px; }
+  .c2 .rail{ background: var(--surface); border-right: 1px solid var(--line); padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .c2 .rail a{ display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; color: var(--sub); text-decoration: none; font-size: 0.86rem; font-weight: 500; }
+  .c2 .rail a svg{ opacity: 0.8; flex-shrink: 0; }
+  .c2 .rail a.on{ background: var(--accent-soft); color: var(--accent); }
+  .c2 .main{ padding: 22px 26px; }
+  .c2 .main h2{ font-family: 'Sora', sans-serif; font-size: 1.05rem; margin: 0 0 16px; }
+  .c2 .grid{ display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 14px; }
+  .c2 .pcard{ background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 12px; text-align: center; box-shadow: 0 1px 2px rgba(15,23,32,0.04); }
+  .c2 .pcard .av{ width: 52px; height: 52px; margin: 0 auto 10px; background: var(--accent-soft); color: var(--accent); font-size: 1rem; font-family: 'Sora', sans-serif; }
+  .c2 .pcard .nm{ font-weight: 600; font-size: 0.88rem; }
+  .c2 .pcard .meta{ font-size: 0.7rem; color: var(--sub); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+
+  .c2 .tree{ padding: 30px 26px 40px; }
+  .c2 .gen-label{ font-size: 0.72rem; font-weight: 600; color: var(--sub); text-align: center; margin-bottom: 10px; }
+  .c2 .gen-row{ display: flex; justify-content: center; gap: 28px; position: relative; padding-bottom: 30px; }
+  .c2 .gen-row::after{ content:""; position:absolute; left:50%; bottom:0; width:2px; height:30px; background: var(--line); }
+  .c2 .gen-row.children::before{ content:""; position:absolute; top:-30px; left:50%; width:2px; height:30px; background:var(--line); }
+  .c2 .node{ background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 2px rgba(15,23,32,0.04); }
+  .c2 .node .av{ width: 32px; height: 32px; background: var(--accent-soft); color: var(--accent); font-size: 0.74rem; }
+  .c2 .node .nm{ font-weight: 600; font-size: 0.86rem; }
+  .c2 .node .role{ font-size: 0.68rem; color: var(--sub); }
+
+  .c2 .modal-stage{ background: var(--bg); padding: 40px 26px; display: flex; justify-content: center; }
+  .c2 .modal{ background: var(--surface); border-radius: 16px; width: 100%; max-width: 420px; padding: 24px; box-shadow: 0 20px 44px rgba(15,23,32,0.14); }
+  .c2 .modal h3{ font-family: 'Sora', sans-serif; margin: 0 0 4px; font-size: 1.1rem; }
+  .c2 .modal .hint{ font-size: 0.8rem; color: var(--sub); margin: 0 0 18px; }
+  .c2 .field{ margin-bottom: 13px; }
+  .c2 .field label{ display: block; font-size: 0.76rem; color: var(--sub); margin-bottom: 5px; font-weight: 500; }
+  .c2 .field input, .c2 .field select{ width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); padding: 9px 10px; font: inherit; font-size: 0.88rem; color: var(--ink); }
+  .c2 .field.two{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .c2 .actions{ display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  .c2 .btn{ font: inherit; font-size: 0.85rem; font-weight: 600; padding: 9px 18px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  .c2 .btn.ghost{ background: transparent; color: var(--ink); border-color: var(--line); }
+
+  /* ============================================================ */
+  /* CONCEPT 3 — "Atlas"                                           */
+  /* Palette: near-black ground, warm amber accent, violet-blue    */
+  /*          secondary                                             */
+  /* Type: Unbounded (display) / IBM Plex Sans (body) / IBM Plex   */
+  /*       Mono (data)                                              */
+  /* Layout: command-center — icon-only rail, constellation tree   */
+  /* ============================================================ */
+  .c3{
+    --bg: #0c0e13;
+    --surface: #14171e;
+    --ink: #e7e9ee;
+    --sub: #868c99;
+    --line: #262b36;
+    --accent: #e3a13b;
+    --accent2: #6c7bd8;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  }
+  .c3 .topbar{ display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .c3 .topbar .mark{ font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .c3 .topbar .mark .dot{ width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .c3 .topbar nav{ display: flex; gap: 20px; font-size: 0.82rem; }
+  .c3 .topbar nav a{ color: var(--sub); text-decoration: none; }
+  .c3 .topbar nav a.on{ color: var(--accent); }
+  .c3 .topbar .user{ font-size: 0.8rem; color: var(--sub); font-family: 'IBM Plex Mono', monospace; }
+  .c3 .body{ display: grid; grid-template-columns: 56px 1fr; min-height: 440px; }
+  .c3 .rail{ background: var(--surface); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 0; }
+  .c3 .rail .ic{ width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: var(--sub); }
+  .c3 .rail .ic.on{ background: rgba(227,161,59,0.14); color: var(--accent); }
+  .c3 .main{ padding: 22px 26px; }
+  .c3 .main .heading{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px; }
+  .c3 .main h2{ font-family: 'Unbounded', sans-serif; font-size: 0.95rem; font-weight: 600; margin: 0; color: var(--ink); }
+  .c3 .search{ display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; width: 260px; }
+  .c3 .search input{ border: none; background: transparent; outline: none; font: inherit; font-size: 0.82rem; width: 100%; color: var(--ink); font-family: 'IBM Plex Mono', monospace; }
+  .c3 .search svg{ opacity: 0.5; flex-shrink: 0; }
+  .c3 .grid{ display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+  .c3 .pcard{ background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; }
+  .c3 .pcard .av{ width: 44px; height: 44px; margin: 0 auto 8px; background: rgba(227,161,59,0.14); color: var(--accent); font-size: 0.85rem; font-family: 'Unbounded', sans-serif; border: 1px solid rgba(227,161,59,0.3); }
+  .c3 .pcard .nm{ font-weight: 500; font-size: 0.84rem; }
+  .c3 .pcard .meta{ font-size: 0.66rem; color: var(--sub); margin-top: 3px; font-family: 'IBM Plex Mono', monospace; }
+
+  .c3 .tree{ padding: 34px 26px 42px; position: relative; }
+  .c3 .gen-label{ font-family: 'IBM Plex Mono', monospace; font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); text-align: center; margin-bottom: 12px; }
+  .c3 .gen-row{ display: flex; justify-content: center; gap: 30px; position: relative; padding-bottom: 32px; }
+  .c3 .gen-row::after{ content:""; position:absolute; left:50%; bottom:0; width:1px; height:32px; background: linear-gradient(var(--accent2), transparent); }
+  .c3 .gen-row.children::before{ content:""; position:absolute; top:-32px; left:50%; width:1px; height:32px; background: linear-gradient(var(--accent2), transparent); }
+  .c3 .node{ background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; position: relative; }
+  .c3 .node::before{ content:""; position:absolute; inset:-1px; border-radius:10px; border:1px solid var(--accent2); opacity:0; transition:opacity .2s; }
+  .c3 .node.focus::before{ opacity: 0.6; }
+  .c3 .node .av{ width: 30px; height: 30px; background: rgba(108,123,216,0.16); color: var(--accent2); font-size: 0.7rem; }
+  .c3 .node.focus .av{ background: rgba(227,161,59,0.16); color: var(--accent); }
+  .c3 .node .nm{ font-weight: 500; font-size: 0.84rem; }
+  .c3 .node .role{ font-size: 0.64rem; color: var(--sub); font-family: 'IBM Plex Mono', monospace; }
+
+  .c3 .modal-stage{ background: var(--bg); padding: 40px 26px; display: flex; justify-content: center; }
+  .c3 .modal{ background: var(--surface); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 420px; padding: 24px; }
+  .c3 .modal h3{ font-family: 'Unbounded', sans-serif; font-size: 1rem; margin: 0 0 4px; color: var(--ink); }
+  .c3 .modal .hint{ font-size: 0.78rem; color: var(--sub); margin: 0 0 18px; }
+  .c3 .field{ margin-bottom: 13px; }
+  .c3 .field label{ display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sub); margin-bottom: 5px; }
+  .c3 .field input, .c3 .field select{ width: 100%; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); padding: 8px 10px; font: inherit; font-size: 0.85rem; color: var(--ink); }
+  .c3 .field.two{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .c3 .actions{ display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  .c3 .btn{ font: inherit; font-size: 0.82rem; font-weight: 600; padding: 9px 18px; border-radius: 7px; border: 1px solid var(--accent); background: var(--accent); color: #141414; cursor: pointer; }
+  .c3 .btn.ghost{ background: transparent; color: var(--ink); border-color: var(--line); }
+
+  @media (max-width: 720px){
+    .c1 .body, .c2 .body, .c3 .body{ grid-template-columns: 1fr; }
+    .c1 .rail, .c2 .rail, .c3 .rail{ display: none; }
+    .c1 .row{ grid-template-columns: 1fr; gap: 4px; }
+    .c1 .row .dates{ text-align: left; }
+    .gen-row{ flex-wrap: wrap; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="intro">
+    <h1>Three directions for the family tree app</h1>
+    <p>Same screens — overview with search, the focus tree, and the Add Person form — rendered three ways. Pick the one to implement, mix elements across them, or ask for a fourth.</p>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" data-tab="c1" role="tab" aria-selected="true">Highland Ledger <span>warm, record-book, brass accent</span></button>
+    <button class="tab" data-tab="c2" role="tab" aria-selected="false">Clarity <span>light app shell, teal accent</span></button>
+    <button class="tab" data-tab="c3" role="tab" aria-selected="false">Atlas <span>dark command-center, amber accent</span></button>
+  </div>
+
+  <!-- ======================= CONCEPT 1 ======================= -->
+  <section class="panel active" id="panel-c1">
+    <div class="frame c1">
+      <div class="plate">
+        <div class="mark">Mandic Family Ledger</div>
+        <nav>
+          <a class="current" href="#">Home</a>
+          <a href="#">Search</a>
+          <a href="#">Add</a>
+          <a href="#">Focus</a>
+          <a href="#">Hi, Dejan</a>
+          <a href="#">Log out</a>
+        </nav>
+      </div>
+      <div class="body">
+        <aside class="rail">
+          <div class="who">
+            <div class="av">HS</div>
+            <div>
+              <h3>Hamish Sinclair</h3>
+              <p>Family patriarch</p>
+            </div>
+          </div>
+          <a class="entry on" href="#">Overview</a>
+          <a class="entry" href="#">Person profile</a>
+          <a class="entry" href="#">Focus view</a>
+          <a class="entry" href="#">Add offspring</a>
+          <a class="entry" href="#">Gallery</a>
+        </aside>
+        <div class="main">
+          <h2>Entry Book — 124 recorded</h2>
+          <div class="search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input placeholder="Search by first or last name…" />
+          </div>
+          <div class="ledger-rows">
+            <div class="row"><span class="idx">001</span><span class="name"><span class="av">HS</span>Hamish Sinclair</span><span class="tag">Patriarch</span><span class="dates">b. 1931</span></div>
+            <div class="row"><span class="idx">002</span><span class="name"><span class="av">SS</span>Sorcha Sinclair</span><span class="tag">Matriarch</span><span class="dates">b. 1933</span></div>
+            <div class="row"><span class="idx">014</span><span class="name"><span class="av">IS</span>Isla Sinclair</span><span class="tag">Eldest dau.</span><span class="dates">b. 1954</span></div>
+            <div class="row"><span class="idx">015</span><span class="name"><span class="av">AS</span>Alistair Sinclair</span><span class="tag">Second son</span><span class="dates">b. 1957</span></div>
+            <div class="row"><span class="idx">016</span><span class="name"><span class="av">LS</span>Lewis Sinclair</span><span class="tag">Eldest son</span><span class="dates">b. 1959</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="frame-label">Focus view — parents side by side, centered</p>
+    <div class="frame c1">
+      <div class="tree">
+        <div class="gen-label">Generation I</div>
+        <div class="gen-row">
+          <div class="card"><div class="av">HS</div><div><div class="nm">Hamish</div><div class="role">Father</div></div></div>
+          <div class="card"><div class="av">SS</div><div><div class="nm">Sorcha</div><div class="role">Mother</div></div></div>
+        </div>
+        <div class="gen-label">Generation II — in focus</div>
+        <div class="gen-row">
+          <div class="card" style="border-color:#9c6b2e;"><div class="av">AS</div><div><div class="nm">Alistair Sinclair</div><div class="role">Focus</div></div></div>
+        </div>
+        <div class="gen-row children">
+          <div class="card"><div class="av">EU</div><div><div class="nm">Euan</div><div class="role">Son</div></div></div>
+          <div class="card"><div class="av">MA</div><div><div class="nm">Mairi</div><div class="role">Daughter</div></div></div>
+          <div class="card"><div class="av">FI</div><div><div class="nm">Finlay</div><div class="role">Son</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="frame-label">Add person</p>
+    <div class="frame c1">
+      <div class="modal-stage">
+        <div class="modal">
+          <h3>Add an entry</h3>
+          <p class="hint">Record a new person in the ledger.</p>
+          <div class="field two">
+            <div class="field"><label>First name</label><input/></div>
+            <div class="field"><label>Last name</label><input/></div>
+          </div>
+          <div class="field"><label>Maiden name</label><input/></div>
+          <div class="field two">
+            <div class="field"><label>Born</label><input placeholder="DD / MM / YYYY"/></div>
+            <div class="field"><label>Died</label><input placeholder="DD / MM / YYYY"/></div>
+          </div>
+          <div class="field"><label>Residency</label><input/></div>
+          <div class="field"><label>Note</label><input/></div>
+          <div class="actions">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn">Add to ledger</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= CONCEPT 2 ======================= -->
+  <section class="panel" id="panel-c2">
+    <div class="frame c2">
+      <div class="topbar">
+        <div class="mark"><span class="dot"></span>Mandic Tree</div>
+        <div class="search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input placeholder="Search by first or last name…" />
+        </div>
+        <div class="user"><div class="av">D</div>Dejan</div>
+      </div>
+      <div class="body">
+        <aside class="rail">
+          <a class="on" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-7 9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg>Overview</a>
+          <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="3"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</a>
+          <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M6 8.5V13M18 8.5V13M8 13h8M12 13v2.5"/></svg>Focus</a>
+          <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add</a>
+        </aside>
+        <div class="main">
+          <h2>124 family members</h2>
+          <div class="grid">
+            <div class="pcard"><div class="av">HS</div><div class="nm">Hamish</div><div class="meta">b.1931</div></div>
+            <div class="pcard"><div class="av">SS</div><div class="nm">Sorcha</div><div class="meta">b.1933</div></div>
+            <div class="pcard"><div class="av">IS</div><div class="nm">Isla</div><div class="meta">b.1954</div></div>
+            <div class="pcard"><div class="av">AS</div><div class="nm">Alistair</div><div class="meta">b.1957</div></div>
+            <div class="pcard"><div class="av">LS</div><div class="nm">Lewis</div><div class="meta">b.1959</div></div>
+            <div class="pcard"><div class="av">CA</div><div class="nm">Catriona</div><div class="meta">b.1961</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="frame-label">Focus view — parents side by side, centered</p>
+    <div class="frame c2">
+      <div class="tree">
+        <div class="gen-label">PARENTS</div>
+        <div class="gen-row">
+          <div class="node"><div class="av">HS</div><div><div class="nm">Hamish</div><div class="role">Father</div></div></div>
+          <div class="node"><div class="av">SS</div><div><div class="nm">Sorcha</div><div class="role">Mother</div></div></div>
+        </div>
+        <div class="gen-label">IN FOCUS</div>
+        <div class="gen-row">
+          <div class="node" style="border-color:#0d7377;"><div class="av">AS</div><div><div class="nm">Alistair Sinclair</div><div class="role">Focus</div></div></div>
+        </div>
+        <div class="gen-row children">
+          <div class="node"><div class="av">EU</div><div><div class="nm">Euan</div><div class="role">Son</div></div></div>
+          <div class="node"><div class="av">MA</div><div><div class="nm">Mairi</div><div class="role">Daughter</div></div></div>
+          <div class="node"><div class="av">FI</div><div><div class="nm">Finlay</div><div class="role">Son</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="frame-label">Add person</p>
+    <div class="frame c2">
+      <div class="modal-stage">
+        <div class="modal">
+          <h3>Add a person</h3>
+          <p class="hint">They'll appear in the overview right away.</p>
+          <div class="field two">
+            <div class="field"><label>First name</label><input/></div>
+            <div class="field"><label>Last name</label><input/></div>
+          </div>
+          <div class="field"><label>Maiden name</label><input/></div>
+          <div class="field two">
+            <div class="field"><label>Born</label><input placeholder="DD / MM / YYYY"/></div>
+            <div class="field"><label>Died</label><input placeholder="DD / MM / YYYY"/></div>
+          </div>
+          <div class="field"><label>Residency</label><input/></div>
+          <div class="field"><label>Note</label><input/></div>
+          <div class="actions">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn">Add person</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= CONCEPT 3 ======================= -->
+  <section class="panel" id="panel-c3">
+    <div class="frame c3">
+      <div class="topbar">
+        <div class="mark"><span class="dot"></span>ATLAS — MANDIC</div>
+        <nav>
+          <a class="on" href="#">Home</a>
+          <a href="#">Search</a>
+          <a href="#">Add</a>
+          <a href="#">Focus</a>
+        </nav>
+        <div class="user">dmandic · admin</div>
+      </div>
+      <div class="body">
+        <aside class="rail">
+          <div class="ic on"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-7 9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg></div>
+          <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+          <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M6 8.5V13M18 8.5V13M8 13h8M12 13v2.5"/></svg></div>
+          <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+        </aside>
+        <div class="main">
+          <div class="heading">
+            <h2>REGISTRY · 124 NODES</h2>
+            <div class="search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input placeholder="search_name"/>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="pcard"><div class="av">HS</div><div class="nm">Hamish</div><div class="meta">#0001</div></div>
+            <div class="pcard"><div class="av">SS</div><div class="nm">Sorcha</div><div class="meta">#0002</div></div>
+            <div class="pcard"><div class="av">IS</div><div class="nm">Isla</div><div class="meta">#0014</div></div>
+            <div class="pcard"><div class="av">AS</div><div class="nm">Alistair</div><div class="meta">#0015</div></div>
+            <div class="pcard"><div class="av">LS</div><div class="nm">Lewis</div><div class="meta">#0016</div></div>
+            <div class="pcard"><div class="av">CA</div><div class="nm">Catriona</div><div class="meta">#0019</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="frame-label">Focus view — parents side by side, centered</p>
+    <div class="frame c3">
+      <div class="tree">
+        <div class="gen-label">Ancestors</div>
+        <div class="gen-row">
+          <div class="node"><div class="av">HS</div><div><div class="nm">Hamish</div><div class="role">father</div></div></div>
+          <div class="node"><div class="av">SS</div><div><div class="nm">Sorcha</div><div class="role">mother</div></div></div>
+        </div>
+        <div class="gen-label">Focus</div>
+        <div class="gen-row">
+          <div class="node focus"><div class="av">AS</div><div><div class="nm">Alistair Sinclair</div><div class="role">node #0015</div></div></div>
+        </div>
+        <div class="gen-row children">
+          <div class="node"><div class="av">EU</div><div><div class="nm">Euan</div><div class="role">son</div></div></div>
+          <div class="node"><div class="av">MA</div><div><div class="nm">Mairi</div><div class="role">daughter</div></div></div>
+          <div class="node"><div class="av">FI</div><div><div class="nm">Finlay</div><div class="role">son</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="frame-label">Add person</p>
+    <div class="frame c3">
+      <div class="modal-stage">
+        <div class="modal">
+          <h3>New node</h3>
+          <p class="hint">Register a new person in the graph.</p>
+          <div class="field two">
+            <div class="field"><label>First name</label><input/></div>
+            <div class="field"><label>Last name</label><input/></div>
+          </div>
+          <div class="field"><label>Maiden name</label><input/></div>
+          <div class="field two">
+            <div class="field"><label>Born</label><input placeholder="YYYY-MM-DD"/></div>
+            <div class="field"><label>Died</label><input placeholder="YYYY-MM-DD"/></div>
+          </div>
+          <div class="field"><label>Residency</label><input/></div>
+          <div class="field"><label>Note</label><input/></div>
+          <div class="actions">
+            <button class="btn ghost">Cancel</button>
+            <button class="btn">Commit node</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', 'false'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.setAttribute('aria-selected', 'true');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,103 +1,271 @@
 .toolbar{
   opacity: 0;
-  background-image: linear-gradient(260deg,hsl(159, 43%, 59%),hsl(159, 30%, 49%));
-  border-radius: 15px;
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-  box-shadow: 10px 0px 10px rgba(0, 0, 0, 0.3);
-  display: grid;
-  justify-content: center;
-  align-items: center;
-  width: 15vw;
-  height: 86vh;
-  margin-top: 0.5vh;
-  margin-left: -0.4vw;
-  position: absolute;
-  z-index: 99;
-  transform: translateX(-100%);     
-  transition: 
-    opacity 0.4s ease,
-    transform 0.4s ease;           
-  will-change: opacity, transform;
-}
-  
-.toolbarPhoto{
-  width: 10vw;
-  border-radius: 15px;
-  border: 3px white solid;
-  /* border-top-right-radius: 0; */
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  background-color: white;
-  padding-left: 2vw;
-  padding-right: 1vw;
-}
-.toolbar h2{
-  margin-top:10vh;
-  color:white;
-}
-.toolbarGallery{
+  pointer-events: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   display: flex;
-  border: 1px solid #ffffff69;
-  border-radius: 10px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-left: none;
-  flex-direction: column;       /* ← key change */
-  flex-wrap: wrap;              /* ← allows multiple columns */
-  height: 30vh;                 /* fixed height → enables wrapping */
-  width: 14.5vw;
-  padding-left: 0.2vw;
-  overflow-y: auto;             /* scrollbar appears here */
-  overflow-x: auto;
-  position: relative;
-  z-index: 10;
-  justify-content: flex-start;  /* start from top */
-  align-content: flex-start;    /* important for multi-column */
-  gap: 0.2vw;
+  flex-direction: column;
+  /* Deliberately NOT var(--sidebar-w) — that var is the full reserved lane
+     behind this card (see index.css), sized wider on purpose so the lane's
+     backdrop (SideBar) fully covers this card plus a bit of margin. This
+     card itself keeps its own fixed width regardless of how wide that
+     lane is. */
+  width: 260px;
+  height: calc(100vh - var(--header-h) - var(--footer-h) - 56px);
+  padding: 44px 18px 18px;
+  position: fixed;
+  top: calc(var(--header-h) + 36px);
+  left: 20px;
+  z-index: 99;
+  /* Slides fully past its own left margin, not just its own width, so no
+     sliver of the card is left peeking in at the viewport edge. */
+  transform: translateX(calc(-100% - 40px));
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  will-change: opacity, transform;
   box-sizing: border-box;
 }
-.toolbarGallery .toolbarGalleryPhoto{
-  width: 3vw;
-}
-.toolbarGallery p{
-  color: #ffffff;
-  align-self: center;
-  text-decoration:wavy;
-  font-weight: 1px;
-  font-style: italic;
-  font-size: 0.9em;
-  margin-left: 4.5vw;
-  margin-top: 14.5vh;
-}
-.toolbarInfo{
-  margin: 0.5vw;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  color: #fffffff6;
-  font-weight: 1;
-  font-style: normal;
-  font-style: italic;
-  font-size: normal;
-}
-.toolbar ul{
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  margin-top: 0px;
-  margin-bottom: px;
-  padding-left: 0;
-}
-.toolbar ul li{
-  text-align: center;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  text-decoration: none;
-  list-style-type: none;
-  border: 1px solid #ffffff44;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
+
+/* Primary open/close driver — set from Toolbar.tsx based on who's
+   displayed, with a deliberate brief close+reopen when switching from one
+   person to a different one (see panelVisible there). Kept as an explicit
+   class rather than relying on :hover, since the close+reopen flourish on
+   switching needs to happen even while the mouse never actually leaves
+   the tree canvas. */
+.toolbar.toolbarVisible{
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
 }
 
+/* Safety net: stay open while the cursor is directly on the panel, even if
+   panelVisible briefly says otherwise (e.g. moving onto it to click a
+   button right as someone else is hovered elsewhere). */
+.toolbar:hover{
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+/* Dwelling on a person for 2s (see HoveredPersonContext) pins the panel
+   open regardless of hover state, so it stops retracting the moment the
+   mouse leaves. */
+.toolbar.toolbarPinned{
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.toolbarCloseBtn{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--sub);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.toolbarCloseBtn:hover{
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+/* Avatar badge overlapping the top edge of the card, with the dwell
+   progress drawn as a ring around it instead of a bar above the photo.
+   Lives outside .toolbarScroll (which scrolls/clips) so the badge poking
+   up above the card's own top edge never gets cut off. */
+.toolbarAvatarWrap{
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 84px;
+  height: 84px;
+}
+
+.toolbarRing{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Start the fill at 12 o'clock instead of SVG's default 3 o'clock. */
+  transform: rotate(-90deg);
+}
+
+.toolbarRing circle{
+  fill: none;
+  stroke-width: 3;
+}
+
+.toolbarRingTrack{
+  stroke: var(--line);
+}
+
+.toolbarRingFill{
+  stroke: var(--accent);
+  stroke-linecap: round;
+  /* pathLength=100 on both circles (see Toolbar.tsx) lets the dash values
+     be plain 0-100 percentages regardless of the circle's actual radius. */
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+/* Fills over the same 2000ms window HoveredPersonContext uses to pin the
+   panel open (see PIN_DELAY_MS there), so the ring finishing lines up
+   exactly with the pin triggering. A CSS `animation` so it reliably
+   auto-plays the instant the ring appears (a `transition` wouldn't animate
+   on first mount, only on a later change). */
+.toolbarRingFill--filling{
+  animation: toolbarRingFillAnim 2000ms linear forwards;
+}
+
+@keyframes toolbarRingFillAnim{
+  to{
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Stays lit once pinned — no animation, just the resting full state. */
+.toolbarRingFill--filled{
+  stroke-dashoffset: 0;
+}
+
+/* Hovering a different person retracts the ring back to empty before the
+   component (see handleRetractEnd in Toolbar.tsx) switches it over to
+   fill for the new person. A `transition` (not a keyframe animation) so it
+   smoothly interpolates from wherever the ring currently is, including a
+   fill that was interrupted partway through. */
+.toolbarRingFill--retracting{
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 350ms ease-in;
+}
+
+.toolbarPhoto{
+  position: absolute;
+  inset: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--surface-raised);
+  background: var(--surface);
+}
+
+/* Scrolls independently of the avatar badge above it, so a long gallery
+   never clips the badge poking up past the card's own top edge. */
+.toolbarScroll{
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.toolbarInfo{
+  text-align: center;
+  margin-top: 6px;
+}
+
+.toolbarInfo p{
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.toolbarInfo .toolbarName{
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.toolbarInfo .toolbarNote{
+  color: var(--sub);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.toolbar ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toolbar ul li{
+  text-align: left;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.toolbar ul li:hover{
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.toolbar ul li.disabled{
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+.toolbarGalleryLabel{
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sub);
+}
+
+/* Horizontal filmstrip instead of a grid, so the gallery never competes
+   with the action list for vertical room inside the card. */
+.toolbarGallery{
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.toolbarGallery p{
+  color: var(--sub);
+  font-size: 0.78rem;
+  font-style: italic;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.toolbarGallery .toolbarGalleryPhoto{
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 768px) {
+  .toolbar{
+    display: none;
+  }
+}

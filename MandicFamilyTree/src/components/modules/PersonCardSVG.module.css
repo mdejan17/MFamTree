@@ -1,36 +1,38 @@
 .rootSVG {
-    transition: 0.5s ease;
-}
-g:has(> .rootSVG){
-
+    transition: transform 0.2s ease, filter 0.2s ease;
+    cursor: pointer;
 }
 .rootSVG:hover {
-    filter: brightness(1.08);
-    transform: scale(1.5);         
+    filter: brightness(1.25);
+    transform: scale(1.35);
 }
-
-.rootSVG:hover ~ .toolbar{
-    background-color: black;
-    transform: scale(1.5);         
+/* Off-white polaroid frame — deliberately warmer and higher-contrast than
+   a dark-on-dark card, so it reads as a distinct photo shape against the
+   tree's dark background even zoomed out. */
+.polaroidFrame {
+    fill: #eceae3;
+    stroke: #e3a13b;
 }
-.cardRect {
-    fill: #ffffff;  
-    filter: drop-shadow(200px 200px 200px rgba(0, 0, 0, 0.887));
+.polaroidFrameFocused {
+    filter: drop-shadow(0 0 10px rgba(227, 161, 59, 0.85));
 }
-.profileImage {
-    stroke: #0e0e0e;
-    stroke-width: 4;
+/* The blank photos peeking out from underneath the main one — duller than
+   the top frame so it still reads as "behind" even without real drop
+   shadows (SVG filters are expensive to layer three-deep on every node). */
+.polaroidBack {
+    fill: #cfccc2;
+}
+.polaroidBackPhoto {
+    fill: #1b1f28;
 }
 .name {
-    font-size: 1em;
-    font-weight: 0 !important;
-    fill: #111827;
+    font-size: 2.2em;
+    font-weight: 500;
+    font-family: 'IBM Plex Mono', monospace;
+    fill: #2a2a28;
 }
 .note {
     font-size: 1em;
-    fill: #6b7280;
+    fill: #868c99;
     font-style: italic;
 }
-
-/* kinda doesnt work */
-
